@@ -13,7 +13,7 @@ export default function PatientDashboard() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       
-      {/* 1. 환자 요약 정보 헤더 */}
+      {/* 환자 요약 정보 헤더 */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
         <div>
           <h1 className="text-2xl font-black text-gray-900">
@@ -28,7 +28,7 @@ export default function PatientDashboard() {
         </div>
       </div>
 
-      {/* 2. 주요 액션 버튼 (3개의 큰 핵심 기능) */}
+      {/* 주요 액션 버튼 (3개의 큰 핵심 기능) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* 가장 중요한 기능이므로 Primary 컬러(Blue) 사용 */}
         <button
@@ -59,7 +59,7 @@ export default function PatientDashboard() {
         </button>
       </div>
 
-      {/* 3. 하단 정보 패널 (2단 그리드 구조) */}
+      {/* 하단 정보 패널 (2단 그리드 구조) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* === 좌측 열 === */}
