@@ -10,7 +10,7 @@ export default function DoctorLayout() {
   const [patientTab, setPatientTab] = useState('today'); // 'today' | 'all'
   const [sortBy, setSortBy] = useState('name'); // 'name' | 'age'
 
-  // 임시 환자 데이터 (나중에는 API로 관리)
+  // 하드코딩 - 나중에 api 연결
   const patients = [
     { id: 'P007', name: '김환자', age: 62, sex: 'M', time: '09:30', status: 'waiting' },
     { id: 'P008', name: '이환자', age: 45, sex: 'F', time: '10:00', status: 'done' },
@@ -25,7 +25,7 @@ export default function DoctorLayout() {
   return (
     <div className="h-screen flex flex-col bg-gray-100 overflow-hidden font-sans text-slate-900">
       
-      {/* 1. 상단 헤더 (Header) */}
+      {/* 상단 헤더 */}
       <header className="h-14 bg-slate-900 text-white px-4 flex justify-between items-center z-30 shrink-0 shadow-lg">
         <Link to="/doctor" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center font-bold text-white text-xl">✚</div>
@@ -45,10 +45,10 @@ export default function DoctorLayout() {
         </div>
       </header>
 
-      {/* 2. 메인 바디 (3분할 레이아웃) */}
+      {/* 메인 바디 (3분할 레이아웃) */}
       <div className="flex flex-1 overflow-hidden">
         
-        {/* === [좌측] 환자 리스트 사이드바 === */}
+        {/* 환자 리스트 사이드바 */}
         <aside className="w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 z-20 shadow-sm">
           {/* 상단 탭 제어 */}
           <div className="p-3 border-b space-y-3 bg-slate-50">
@@ -80,7 +80,7 @@ export default function DoctorLayout() {
             </div>
           </div>
 
-          {/* 환자 목록 영역 (Scroll) */}
+          {/* 환자 목록 영역 */}
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
             {patients.map((p) => (
               <button 
@@ -103,12 +103,12 @@ export default function DoctorLayout() {
           </div>
         </aside>
 
-        {/* === [중앙] 메인 작업 영역 === */}
+        {/* 메인 작업 영역 */}
         <main className="flex-1 overflow-y-auto bg-slate-50 relative">
           <Outlet />
         </main>
 
-        {/* === [우측] 진료 예약/스케줄 사이드바 === */}
+        {/* 우측: 진료 예약/스케줄 사이드바 */}
         <aside className="w-80 bg-white border-l border-gray-200 flex flex-col shrink-0 z-10">
           {/* 상단: 캘린더 위젯 */}
           <div className="p-4 border-b">

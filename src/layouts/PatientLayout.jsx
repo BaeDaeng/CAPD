@@ -11,7 +11,6 @@ export default function PatientLayout() {
     navigate('/login');
   };
 
-  // 좌측 사이드바에 들어갈 5개의 바로가기 메뉴
   const navItems = [
     { path: '/patient', label: '홈 대시보드', icon: '🏠', exact: true },
     { path: '/patient/record', label: '투석 기록하기', icon: '📝' },
@@ -22,42 +21,41 @@ export default function PatientLayout() {
   ];
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 font-sans text-gray-900 overflow-hidden">
+    // 모바일 하단 탭바 공간을 위해 pb-16(padding-bottom)을 주고, PC(md)에서는 pb-0으로 원복합니다.
+    <div className="h-screen flex flex-col bg-slate-50 font-sans text-gray-900 overflow-hidden relative pb-16 md:pb-0">
       
-      {/* 상단 헤더 */}
-      <header className="h-16 bg-white border-b border-gray-200 px-6 flex justify-between items-center z-30 shrink-0 shadow-sm">
-        {/* 타이틀 링크: 누르면 /patient 로 이동 */}
-        <Link to="/patient" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-xl shadow-md group-hover:scale-105 transition-transform">
-            ✚
+      {/* 1. 상단 헤더 */}
+      <header className="h-16 bg-white border-b border-gray-200 px-4 md:px-6 flex justify-between items-center z-30 shrink-0 shadow-sm">
+        <Link to="/patient" className="flex items-center gap-2 md:gap-3 group">
+          <div className="w-8 h-8 md:w-9 md:h-9 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-lg md:text-xl shadow-md group-hover:scale-105 transition-transform">
+            C
           </div>
-          <div className="text-xl font-bold tracking-tight text-gray-800">
-            CAPD Care <span className="font-medium text-blue-600 text-base ml-1">환자 포털</span>
+          <div className="text-lg md:text-xl font-bold tracking-tight text-gray-800">
+            CAPD Care <span className="hidden md:inline font-medium text-blue-600 text-base ml-1">환자 포털</span>
           </div>
         </Link>
         
-        {/* 우측 사용자 정보 및 로그아웃 */}
-        <div className="flex items-center gap-5">
-          <div className="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-full border border-gray-100">
-            <span className="text-lg">😊</span>
-            <span className="font-semibold text-sm text-slate-700">{user?.name || '홍길동'} 환자님</span>
+        <div className="flex items-center gap-3 md:gap-5">
+          <div className="flex items-center gap-1.5 md:gap-2 bg-slate-50 px-2.5 py-1.5 md:px-3 rounded-full border border-gray-100">
+            <span className="text-base md:text-lg">😊</span>
+            <span className="font-semibold text-xs md:text-sm text-slate-700">{user?.name || '김환자'}님</span>
           </div>
-          <div className="h-5 w-px bg-gray-300"></div>
+          <div className="h-4 md:h-5 w-px bg-gray-300"></div>
           <button 
             onClick={handleLogout} 
-            className="text-sm font-medium text-gray-500 hover:text-red-500 transition-colors"
+            className="text-xs md:text-sm font-medium text-gray-500 hover:text-red-500 transition-colors"
           >
             로그아웃
           </button>
         </div>
       </header>
 
-      {/* 메인 바디 (좌측 사이드바 + 우측 콘텐츠) */}
+      {/* 2. 메인 바디 */}
       <div className="flex flex-1 overflow-hidden">
         
-        {/* === 좌측 사이드바 (5개의 바로가기) === */}
-        <aside className="w-64 bg-white border-r border-gray-200 flex flex-col shrink-0 py-6 z-20 shadow-[2px_0_8px_-3px_rgba(0,0,0,0.05)]">
-          
+        {/* === [PC 환경 전용] 좌측 사이드바 === */}
+        {/* hidden md:flex 로 설정하여 모바일에서는 숨기고, 태블릿/PC(md 이상)에서만 나타납니다. */}
+        <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 flex-col shrink-0 py-6 z-20 shadow-[2px_0_8px_-3px_rgba(0,0,0,0.05)]">
           <div className="px-6 mb-6">
             <div className="text-xs font-bold text-blue-500 tracking-wider mb-1">QUICK MENU</div>
             <h2 className="text-lg font-black text-gray-800">바로가기</h2>
@@ -68,12 +66,12 @@ export default function PatientLayout() {
               <NavLink
                 key={item.path}
                 to={item.path}
-                end={item.exact} // 홈('/') 경로는 정확히 일치할 때만 활성화
+                end={item.exact}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3.5 rounded-2xl font-bold transition-all duration-200 border ${
                     isActive
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-md transform scale-[1.02]' // 선택된 메뉴 (파란색 바탕 + 흰 글씨)
-                      : 'bg-white text-gray-600 border-gray-100 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 shadow-sm' // 기본 메뉴
+                      ? 'bg-blue-600 text-white border-blue-600 shadow-md transform scale-[1.02]'
+                      : 'bg-white text-gray-600 border-gray-100 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 shadow-sm'
                   }`
                 }
               >
@@ -82,27 +80,46 @@ export default function PatientLayout() {
               </NavLink>
             ))}
           </nav>
-
-          {/* 하단 고객센터 / 문의 영역
-          <div className="mx-4 mt-auto p-4 bg-slate-50 rounded-2xl border border-gray-100 flex flex-col gap-2">
-            <div className="text-sm font-bold text-gray-700 flex items-center gap-2">
-              <span>📞</span> 담당 병원 연락처
-            </div>
-            <div className="text-xs text-gray-500 font-medium bg-white p-2 rounded-lg border border-gray-200 text-center">
-              02-123-4567
-            </div>
-          </div> */}
         </aside>
 
         {/* === 우측 메인 콘텐츠 영역 === */}
-        <main className="flex-1 overflow-y-auto p-8 relative">
+        {/* 모바일 환경을 위해 좌우 여백(p-4 md:p-8)을 기기 사이즈에 맞게 조절합니다. */}
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 relative w-full">
           <div className="max-w-5xl mx-auto h-full">
-            {/* 실제 라우터가 매핑해주는 페이지 내용이 들어가는 곳 */}
             <Outlet /> 
           </div>
         </main>
         
       </div>
+
+      {/* [모바일 환경 전용] 하단 앱 탭 바 */}
+      {/* md:hidden 으로 설정하여 PC에서는 숨기고, 모바일 환경에서만 화면 최하단에 고정됩니다. */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center h-16 z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] px-2 pb-safe">
+        {navItems.map((item) => (
+          <NavLink
+            key={item.path}
+            to={item.path}
+            end={item.exact}
+            className={({ isActive }) =>
+              `flex flex-col items-center justify-center w-full h-full gap-1 transition-colors ${
+                isActive ? 'text-blue-600' : 'text-gray-400 hover:text-gray-600'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <span className={`text-2xl ${isActive ? 'scale-110 transition-transform' : ''}`}>
+                  {item.icon}
+                </span>
+                <span className={`text-[10px] font-bold ${isActive ? 'text-blue-600' : 'text-gray-500'}`}>
+                  {item.label}
+                </span>
+              </>
+            )}
+          </NavLink>
+        ))}
+      </nav>
+
     </div>
   );
 }

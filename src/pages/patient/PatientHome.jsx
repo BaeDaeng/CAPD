@@ -4,19 +4,19 @@ import useAppStore from '../../store/useAppStore';
 
 export default function PatientDashboard() {
   const navigate = useNavigate();
-  // Zustand 스토어에서 로그인한 환자 정보를 가져옵니다.
+  // Zustand 스토어에서 로그인한 환자 정보를 가져옴
   const { user } = useAppStore(); 
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       
-      {/* 1. 환자 요약 정보 헤더 */}
+      {/* 환자 요약 정보 헤더 */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
         <div>
           <h1 className="text-2xl font-black text-gray-900">
             안녕하세요, <span className="text-blue-600">{user?.name || '김환자'}</span> 님!
           </h1>
-          {/* 하드코딩된 예시 정보 - 나중에 API 데이터로 교체 */}
+          {/* 하드코딩됨 - 나중에 API 데이터로 교체 */}
           <p className="text-gray-500 mt-1 font-medium">남자, 54세 | 담당의: 김의사 선생님</p>
         </div>
         <div className="mt-4 md:mt-0 md:text-right bg-slate-50 p-3 rounded-xl border border-gray-100">
@@ -25,7 +25,7 @@ export default function PatientDashboard() {
         </div>
       </div>
 
-      {/* 2. 메인 액션 버튼 (가장 중요한 투석 기록 입력을 단독으로 강조) */}
+      {/* 메인 액션 버튼 */}
       <button
         onClick={() => navigate('/patient/record')}
         className="w-full bg-blue-600 hover:bg-blue-700 text-white p-6 md:p-8 rounded-2xl shadow-sm transition-all flex flex-col md:flex-row items-center gap-4 md:gap-6 group text-left"
@@ -37,7 +37,7 @@ export default function PatientDashboard() {
         </div>
       </button>
 
-      {/* 3. 서브 액션 버튼 그리드 (나머지 4개 기능을 2x2로 깔끔하게 배치) */}
+      {/* 서브 액션 버튼 그리드 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         
         <button
