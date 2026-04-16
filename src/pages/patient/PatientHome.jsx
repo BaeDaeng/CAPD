@@ -1,8 +1,5 @@
-// 임시 페이지
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Card from '../../components/Card';
-import Button from '../../components/Button';
 import useAppStore from '../../store/useAppStore';
 
 export default function PatientDashboard() {
@@ -13,7 +10,7 @@ export default function PatientDashboard() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-10">
       
-      {/* 환자 요약 정보 헤더 */}
+      {/* 1. 환자 요약 정보 헤더 */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
         <div>
           <h1 className="text-2xl font-black text-gray-900">
@@ -28,66 +25,64 @@ export default function PatientDashboard() {
         </div>
       </div>
 
-      {/* 주요 액션 버튼 (3개의 큰 핵심 기능) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* 가장 중요한 기능이므로 Primary 컬러(Blue) 사용 */}
-        <button
-          onClick={() => navigate('/patient/survey')} // 임시로 survey로 연결
-          className="bg-blue-600 hover:bg-blue-700 text-white p-6 rounded-2xl shadow-sm transition-all flex flex-col items-center justify-center gap-3 group"
-        >
-          <div className="text-4xl group-hover:scale-110 transition-transform">📝</div>
-          <div className="text-lg font-bold">투석 기록 입력</div>
-          <div className="text-blue-200 text-sm font-medium">오늘의 투석/상태를 기록하기</div>
-        </button>
+      {/* 2. 메인 액션 버튼 (가장 중요한 투석 기록 입력을 단독으로 강조) */}
+      <button
+        onClick={() => navigate('/patient/record')}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white p-6 md:p-8 rounded-2xl shadow-sm transition-all flex flex-col md:flex-row items-center gap-4 md:gap-6 group text-left"
+      >
+        <div className="text-5xl bg-blue-500/50 p-4 rounded-2xl group-hover:scale-105 transition-transform shrink-0">📝</div>
+        <div>
+          <div className="text-2xl md:text-3xl font-bold mb-2">투석 기록 입력</div>
+          <div className="text-blue-100 font-medium text-sm md:text-base">오늘 하루의 투석 수치와 건강 상태를 잊지 말고 기록해 주세요.</div>
+        </div>
+      </button>
 
-        <button
-          onClick={() => navigate('/patient/survey')}
-          className="bg-white hover:bg-purple-50 border border-gray-200 text-gray-800 p-6 rounded-2xl shadow-sm transition-all flex flex-col items-center justify-center gap-3 group"
-        >
-          <div className="text-4xl group-hover:scale-110 transition-transform">🤖</div>
-          <div className="text-lg font-bold text-purple-700">챗봇 증상 상담</div>
-          <div className="text-gray-500 text-sm font-medium">증상을 설명해 진료에 도움받기</div>
-        </button>
-
-        <button
-          onClick={() => navigate('/patient/survey')}
-          className="bg-white hover:bg-emerald-50 border border-gray-200 text-gray-800 p-6 rounded-2xl shadow-sm transition-all flex flex-col items-center justify-center gap-3 group"
-        >
-          <div className="text-4xl group-hover:scale-110 transition-transform">📋</div>
-          <div className="text-lg font-bold text-emerald-700">건강 설문 조사</div>
-          <div className="text-gray-500 text-sm font-medium">진료전 설문조사를 통해 진료에 도움받기</div>
-        </button>
-      </div>
-
-      {/* 하단 정보 패널 (2단 그리드 구조) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* 3. 서브 액션 버튼 그리드 (나머지 4개 기능을 2x2로 깔끔하게 배치) */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         
-        {/* === 좌측 열 === */}
-        <div className="space-y-6">
-          <button
-          onClick={() => navigate('/patient/survey')}
-          className="bg-white hover:bg-purple-50 border border-gray-200 text-gray-800 p-6 rounded-2xl shadow-sm transition-all flex flex-col items-center justify-center gap-3 group"
+        <button
+          onClick={() => navigate('/patient/chat')}
+          className="bg-white hover:bg-purple-50 border border-gray-200 p-6 rounded-2xl shadow-sm transition-all flex items-center gap-5 group text-left"
         >
-          <div className="text-4xl group-hover:scale-110 transition-transform">🤖</div>
-          <div className="text-lg font-bold text-purple-700">투석 기록 보기</div>
-          <div className="text-gray-500 text-sm font-medium">이전 기록을 목록/기간별로 확인하기</div>
+          <div className="text-4xl bg-purple-100 text-purple-600 p-3 rounded-xl group-hover:scale-110 transition-transform">🤖</div>
+          <div>
+            <div className="text-lg font-bold text-gray-800 group-hover:text-purple-700">챗봇 증상 상담</div>
+            <div className="text-gray-500 text-sm mt-1">이상 증상을 AI에게 설명하고 도움받기</div>
+          </div>
         </button>
 
-          
-        </div>
-
-        {/* === 우측 열 === */}
-        <div className="space-y-6">
-          <button
+        <button
           onClick={() => navigate('/patient/survey')}
-          className="bg-white hover:bg-purple-50 border border-gray-200 text-gray-800 p-6 rounded-2xl shadow-sm transition-all flex flex-col items-center justify-center gap-3 group"
+          className="bg-white hover:bg-emerald-50 border border-gray-200 p-6 rounded-2xl shadow-sm transition-all flex items-center gap-5 group text-left"
         >
-          <div className="text-4xl group-hover:scale-110 transition-transform">🤖</div>
-          <div className="text-lg font-bold text-purple-700">방문 일정 확인하기</div>
-          <div className="text-gray-500 text-sm font-medium">예정된 방문 일정을 확인하기</div>
+          <div className="text-4xl bg-emerald-100 text-emerald-600 p-3 rounded-xl group-hover:scale-110 transition-transform">📋</div>
+          <div>
+            <div className="text-lg font-bold text-gray-800 group-hover:text-emerald-700">건강 설문 조사</div>
+            <div className="text-gray-500 text-sm mt-1">정기적인 설문조사로 진료 품질 높이기</div>
+          </div>
         </button>
 
-        </div>
+        <button
+          onClick={() => navigate('/patient/record_list')}
+          className="bg-white hover:bg-indigo-50 border border-gray-200 p-6 rounded-2xl shadow-sm transition-all flex items-center gap-5 group text-left"
+        >
+          <div className="text-4xl bg-indigo-100 text-indigo-600 p-3 rounded-xl group-hover:scale-110 transition-transform">📈</div>
+          <div>
+            <div className="text-lg font-bold text-gray-800 group-hover:text-indigo-700">투석 기록 보기</div>
+            <div className="text-gray-500 text-sm mt-1">이전 기록을 목록이나 통계로 확인하기</div>
+          </div>
+        </button>
+
+        <button
+          onClick={() => navigate('/patient/schedule')}
+          className="bg-white hover:bg-orange-50 border border-gray-200 p-6 rounded-2xl shadow-sm transition-all flex items-center gap-5 group text-left"
+        >
+          <div className="text-4xl bg-orange-100 text-orange-600 p-3 rounded-xl group-hover:scale-110 transition-transform">📅</div>
+          <div>
+            <div className="text-lg font-bold text-gray-800 group-hover:text-orange-700">방문 일정 확인</div>
+            <div className="text-gray-500 text-sm mt-1">병원 예약 및 다음 방문 일정 확인하기</div>
+          </div>
+        </button>
 
       </div>
     </div>
