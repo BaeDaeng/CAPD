@@ -17,14 +17,14 @@ export default function PatientLayout() {
     { path: '/patient/record_list', label: '투석 기록보기', icon: '📈' },
     { path: '/patient/survey', label: '건강 설문 조사', icon: '📋' },
     { path: '/patient/chat', label: '증상 상담하기', icon: '🤖' },
-    { path: '/patient/schedule', label: '방문 일정 확인하기', icon: '📅' },
+    { path: '/patient/schedule', label: '방문 일정 확인', icon: '📅' },
   ];
 
   return (
-    // 모바일 하단 탭바 공간을 위해 pb-16(padding-bottom)을 주고, PC(md)에서는 pb-0으로 원복합니다.
+    // 모바일 하단 탭바 공간을 위해 pb-16(padding-bottom)을 주고, PC(md)에서는 pb-0으로 원복
     <div className="h-screen flex flex-col bg-slate-50 font-sans text-gray-900 overflow-hidden relative pb-16 md:pb-0">
       
-      {/* 1. 상단 헤더 */}
+      {/* 상단 헤더 */}
       <header className="h-16 bg-white border-b border-gray-200 px-4 md:px-6 flex justify-between items-center z-30 shrink-0 shadow-sm">
         <Link to="/patient" className="flex items-center gap-2 md:gap-3 group">
           <div className="w-8 h-8 md:w-9 md:h-9 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-lg md:text-xl shadow-md group-hover:scale-105 transition-transform">
@@ -50,11 +50,11 @@ export default function PatientLayout() {
         </div>
       </header>
 
-      {/* 2. 메인 바디 */}
+      {/* 메인 바디 */}
       <div className="flex flex-1 overflow-hidden">
         
-        {/* === [PC 환경 전용] 좌측 사이드바 === */}
-        {/* hidden md:flex 로 설정하여 모바일에서는 숨기고, 태블릿/PC(md 이상)에서만 나타납니다. */}
+        {/* PC : 좌측 사이드바 */}
+        {/* hidden md:flex 로 설정 모바일에서는 숨기고, md 이상에서만 나타남 */}
         <aside className="hidden md:flex w-64 bg-white border-r border-gray-200 flex-col shrink-0 py-6 z-20 shadow-[2px_0_8px_-3px_rgba(0,0,0,0.05)]">
           <div className="px-6 mb-6">
             <div className="text-xs font-bold text-blue-500 tracking-wider mb-1">QUICK MENU</div>
@@ -82,8 +82,8 @@ export default function PatientLayout() {
           </nav>
         </aside>
 
-        {/* === 우측 메인 콘텐츠 영역 === */}
-        {/* 모바일 환경을 위해 좌우 여백(p-4 md:p-8)을 기기 사이즈에 맞게 조절합니다. */}
+        {/* 우측 메인 콘텐츠 영역 */}
+        {/*  좌우 여백(p-4 md:p-8)을 기기 사이즈에 맞게 조절함 */}
         <main className="flex-1 overflow-y-auto p-4 md:p-8 relative w-full">
           <div className="max-w-5xl mx-auto h-full">
             <Outlet /> 
@@ -92,8 +92,8 @@ export default function PatientLayout() {
         
       </div>
 
-      {/* [모바일 환경 전용] 하단 앱 탭 바 */}
-      {/* md:hidden 으로 설정하여 PC에서는 숨기고, 모바일 환경에서만 화면 최하단에 고정됩니다. */}
+      {/* 모바일 환경 : 하단 바 */}
+      {/* md:hidden 으로 설정하여 PC에서는 숨기고, 모바일 환경에서만 화면 최하단에 고정됨 */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around items-center h-16 z-40 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] px-2 pb-safe">
         {navItems.map((item) => (
           <NavLink
