@@ -58,7 +58,7 @@ export default function PatientDashboard() {
           <div className="text-4xl bg-emerald-100 text-emerald-600 p-3 rounded-xl group-hover:scale-110 transition-transform">📋</div>
           <div>
             <div className="text-lg font-bold text-gray-800 group-hover:text-emerald-700">건강 설문 조사</div>
-            <div className="text-gray-500 text-sm mt-1">정기적인 설문조사로 진료 품질 높이기</div>
+            <div className="text-gray-500 text-sm mt-1">방문 전 설문조사로 진료 품질 높이기</div>
           </div>
         </button>
 
@@ -69,7 +69,7 @@ export default function PatientDashboard() {
           <div className="text-4xl bg-indigo-100 text-indigo-600 p-3 rounded-xl group-hover:scale-110 transition-transform">📈</div>
           <div>
             <div className="text-lg font-bold text-gray-800 group-hover:text-indigo-700">투석 기록 보기</div>
-            <div className="text-gray-500 text-sm mt-1">이전 기록을 목록이나 통계로 확인하기</div>
+            <div className="text-gray-500 text-sm mt-1">이전 기록을 목록으로 확인하기</div>
           </div>
         </button>
 
@@ -80,7 +80,7 @@ export default function PatientDashboard() {
           <div className="text-4xl bg-orange-100 text-orange-600 p-3 rounded-xl group-hover:scale-110 transition-transform">📅</div>
           <div>
             <div className="text-lg font-bold text-gray-800 group-hover:text-orange-700">방문 일정 확인</div>
-            <div className="text-gray-500 text-sm mt-1">병원 예약 및 다음 방문 일정 확인하기</div>
+            <div className="text-gray-500 text-sm mt-1"> 다음 병원 방문 일정 확인하기</div>
           </div>
         </button>
 

@@ -12,9 +12,9 @@ export default function DoctorLayout() {
 
   // 하드코딩 - 나중에 api 연결
   const patients = [
-    { id: 'P007', name: '김환자', age: 62, sex: 'M', time: '09:30', status: 'waiting' },
-    { id: 'P008', name: '이환자', age: 45, sex: 'F', time: '10:00', status: 'done' },
-    { id: 'P009', name: '박환자', age: 71, sex: 'M', time: '10:30', status: 'waiting' },
+    { id: 'P007', name: '김환자', age: 62, sex: 'M', time: '09:30', status: 'waiting',  lastDialysis: '2026.01.01 12:00'},
+    { id: 'P008', name: '이환자', age: 45, sex: 'F', time: '10:00', status: 'done', lastDialysis: '2026.01.01 12:00'},
+    { id: 'P009', name: '박환자', age: 71, sex: 'M', time: '10:30', status: 'waiting', lastDialysis: '2026.01.01 12:00' },
   ];
 
   const handleLogout = () => {
@@ -93,7 +93,10 @@ export default function DoctorLayout() {
                   <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-mono">{p.id}</span>
                 </div>
                 <div className="flex justify-between items-center mt-1">
-                  <span className="text-xs text-gray-500">{p.sex}/{p.age}세</span>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-500">{p.sex}/{p.age}세</span>
+                    <span className="text-[11px] text-gray-500">최근 투석: {p.lastDialysis}</span>
+                  </div>
                   <span className={`text-[11px] font-bold ${p.status === 'waiting' ? 'text-orange-500' : 'text-gray-400'}`}>
                     {p.status === 'waiting' ? `대기 (${p.time})` : '진료완료'}
                   </span>
@@ -139,15 +142,15 @@ export default function DoctorLayout() {
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {[
-                { time: '14:00', name: '최철수', type: '정기검진' },
-                { time: '15:30', name: '이순자', type: '복막염 의심' },
-                { time: '16:00', name: '정미숙', type: '약제 처방' },
+                { time: '14:00', name: '최철수' },
+                { time: '15:30', name: '이순자' },
+                { time: '16:00', name: '정미숙' },
               ].map((sch, i) => (
                 <div key={i} className="flex gap-3 items-start border-l-2 border-blue-200 pl-3 py-1">
                   <span className="text-xs font-bold text-gray-400 w-10">{sch.time}</span>
                   <div>
                     <div className="text-xs font-bold text-gray-800">{sch.name}</div>
-                    <div className="text-[10px] text-gray-500">{sch.type}</div>
+                    {/* <div className="text-[10px] text-gray-500">{sch.type}</div> */}
                   </div>
                 </div>
               ))}
