@@ -15,8 +15,8 @@ export default function PatientLayout() {
     { path: '/patient', label: '홈 대시보드', icon: '🏠', exact: true },
     { path: '/patient/record', label: '투석 기록하기', icon: '📝' },
     { path: '/patient/chat', label: '증상 상담하기', icon: '🤖' },
-    { path: '/patient/survey', label: '건강 설문 조사', icon: '📋' },
     { path: '/patient/record_list', label: '투석 기록보기', icon: '📈' },
+    { path: '/patient/survey', label: '건강 설문 조사', icon: '📋' },
     { path: '/patient/schedule', label: '방문 일정 확인', icon: '📅' },
   ];
 
