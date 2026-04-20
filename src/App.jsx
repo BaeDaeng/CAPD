@@ -16,8 +16,8 @@ import DoctorLayout from './layouts/DoctorLayout';
  * 나중에 실제 파일을 만드시면 이 부분을 지우고 상단에서 import 하세요.
  */
 import PatientDashboard from './pages/patient/PatientHome';
-const PatientRecord = () => <div className="p-8 text-2xl font-bold">투석 기록 </div>;
-const PatientRecordList = () => <div className="p-8 text-2xl font-bold">기록 확인 </div>;
+import PatientRecord from './pages/patient/DailyRecordPage';
+import PatientRecordList from './pages/patient/RecordListPage';
 const PatientSurvey = () => <div className="p-8 text-2xl font-bold">환자 설문 </div>;
 const PatientChat = () => <div className="p-8 text-2xl font-bold">AI 상담 </div>;
 const PatientSchedule = () => <div className="p-8 text-2xl font-bold">일정 확인 </div>;
