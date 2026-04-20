@@ -18,7 +18,7 @@ export default function PatientDashboard() {
           <p className="text-slate-500 mt-2 font-medium">담당의: 김의사 선생님</p>
         </div>
         
-        {/* 마지막 상태 알림 (알약/칩 형태) */}
+        {/* 마지막 상태 알림 */}
         <div className="flex items-center gap-3 bg-white px-5 py-3.5 rounded-2xl shadow-sm border border-slate-100">
           <span className="relative flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
@@ -31,7 +31,7 @@ export default function PatientDashboard() {
         </div>
       </div>
 
-      {/* 최우선 액션: 투석 기록 (Massive Card) */}
+      {/* 최우선 액션: 투석 기록 */}
       <button
         onClick={() => navigate('/patient/record')}
         className="w-full relative overflow-hidden bg-linear-to-br from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white p-8 md:p-10 rounded-4xl shadow-xl shadow-blue-200/50 transition-all hover:-translate-y-1 group text-left flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
