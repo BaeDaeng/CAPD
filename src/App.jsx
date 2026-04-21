@@ -18,8 +18,8 @@ import DoctorLayout from './layouts/DoctorLayout';
 import PatientDashboard from './pages/patient/PatientHome';
 import PatientRecord from './pages/patient/DailyRecordPage';
 import PatientRecordList from './pages/patient/RecordListPage';
+import PatientSurvey from './pages/patient/HealthSurveyPage';
 import PatientChat from './pages/patient/SymptomHelperPage';
-const PatientSurvey = () => <div className="p-8 text-2xl font-bold">환자 설문 </div>;
 const PatientSchedule = () => <div className="p-8 text-2xl font-bold">일정 확인 </div>;
 
 import DoctorDashboard from './pages/doctor/DoctorHome';
