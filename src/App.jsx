@@ -18,7 +18,6 @@ import DoctorLayout from './layouts/DoctorLayout';
 import PatientDashboard from './pages/patient/PatientHome';
 import PatientRecord from './pages/patient/DailyRecordPage';
 import PatientRecordList from './pages/patient/RecordListPage';
-import PHome from './pages/patient/PatientHome1';
 const PatientSurvey = () => <div className="p-8 text-2xl font-bold">환자 설문 </div>;
 const PatientChat = () => <div className="p-8 text-2xl font-bold">AI 상담 </div>;
 const PatientSchedule = () => <div className="p-8 text-2xl font-bold">일정 확인 </div>;
@@ -44,7 +43,6 @@ function App() {
         {/* === 환자 전용 경로 (PatientLayout 적용) === */}
         <Route path="/patient" element={<PatientLayout />}>
           <Route index element={<PatientDashboard />} />
-          <Route path="home1" element={<PHome />} />
           <Route path="record" element={<PatientRecord />} />
           <Route path="record_list" element={<PatientRecordList />} />
           <Route path="survey" element={<PatientSurvey />} />

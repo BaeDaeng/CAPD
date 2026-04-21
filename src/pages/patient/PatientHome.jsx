@@ -47,7 +47,7 @@ export default function PatientDashboard() {
           </div>
           <h2 className="text-3xl md:text-4xl font-black mb-3 tracking-tight">투석 기록하기</h2>
           <p className="text-blue-100 font-medium text-base md:text-lg opacity-90 max-w-sm">
-            오늘의 주입량, 배액량, 건강 상태를 지금 바로 기록해 주세요.
+            오늘 하루의 투석 수치와 건강 상태를 잊지 말고 기록해 주세요.
           </p>
         </div>
         
@@ -61,20 +61,6 @@ export default function PatientDashboard() {
 
       {/* 위젯형 서브 메뉴 (2x2 Grid) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        
-        {/* 후보1 */}
-        <button
-          onClick={() => navigate('/patient/home1')}
-          className="bg-white p-7 rounded-4xl shadow-sm hover:shadow-md border border-slate-100 hover:border-purple-200 transition-all flex flex-col items-start group text-left"
-        >
-          <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-500 flex items-center justify-center mb-5 group-hover:bg-purple-500 group-hover:text-white transition-colors">
-            <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
-            </svg>
-          </div>
-          <h3 className="text-xl font-bold text-slate-800 mb-2">후보1</h3>
-          <p className="text-slate-500 font-medium">후보1</p>
-        </button>
 
         {/* 챗봇 상담 */}
         <button
@@ -101,7 +87,7 @@ export default function PatientDashboard() {
             </svg>
           </div>
           <h3 className="text-xl font-bold text-slate-800 mb-2">기록 모아보기</h3>
-          <p className="text-slate-500 font-medium">과거의 투석 내역과 제수량 변화를 한눈에 확인합니다.</p>
+          <p className="text-slate-500 font-medium">이전 기록을 목록으로 확인하세요.</p>
         </button>
 
         {/* 건강 설문 */}
@@ -115,7 +101,7 @@ export default function PatientDashboard() {
             </svg>
           </div>
           <h3 className="text-xl font-bold text-slate-800 mb-2">건강 설문</h3>
-          <p className="text-slate-500 font-medium">정기적인 자가 설문으로 의료진에게 상태를 알립니다.</p>
+          <p className="text-slate-500 font-medium">방문 전 설문으로 의료진에게 상태를 알립니다.</p>
         </button>
 
         {/* 방문 일정 */}
@@ -129,7 +115,7 @@ export default function PatientDashboard() {
             </svg>
           </div>
           <h3 className="text-xl font-bold text-slate-800 mb-2">방문 일정</h3>
-          <p className="text-slate-500 font-medium">다음 병원 예약일과 정기 검진 스케줄을 확인합니다.</p>
+          <p className="text-slate-500 font-medium">다음 병원 방문 일정을 확인하세요.</p>
         </button>
 
       </div>
