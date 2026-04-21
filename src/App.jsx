@@ -20,7 +20,7 @@ import PatientRecord from './pages/patient/DailyRecordPage';
 import PatientRecordList from './pages/patient/RecordListPage';
 import PatientSurvey from './pages/patient/HealthSurveyPage';
 import PatientChat from './pages/patient/SymptomHelperPage';
-const PatientSchedule = () => <div className="p-8 text-2xl font-bold">일정 확인 </div>;
+import PatientSchedule from './pages/patient/VisitSchedulePage';
 
 import DoctorDashboard from './pages/doctor/DoctorHome';
 // const DoctorDashboard = () => <div className="p-8 text-2xl font-bold">의사 EMR 대시보드 </div>;
