@@ -18,8 +18,8 @@ import DoctorLayout from './layouts/DoctorLayout';
 import PatientDashboard from './pages/patient/PatientHome';
 import PatientRecord from './pages/patient/DailyRecordPage';
 import PatientRecordList from './pages/patient/RecordListPage';
+import PatientChat from './pages/patient/SymptomHelperPage';
 const PatientSurvey = () => <div className="p-8 text-2xl font-bold">환자 설문 </div>;
-const PatientChat = () => <div className="p-8 text-2xl font-bold">AI 상담 </div>;
 const PatientSchedule = () => <div className="p-8 text-2xl font-bold">일정 확인 </div>;
 
 import DoctorDashboard from './pages/doctor/DoctorHome';
@@ -32,7 +32,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* === 공통 경로 === */}
+        {/* 공통 경로 */}
         {/* 첫 화면을 로그인 페이지로 설정 */}
         <Route path="/login" element={<LoginPage />} />
         
@@ -50,14 +50,14 @@ function App() {
           <Route path="schedule" element={<PatientSchedule />} />
         </Route>
 
-        {/* === 의사 전용 경로 (DoctorLayout 적용) === */}
+        {/* 의사 전용 경로 (DoctorLayout 적용) */}
         <Route path="/doctor" element={<DoctorLayout />}>
           <Route index element={<DoctorDashboard />} />
           {/* 특정 환자 선택 시의 경로 */}
           <Route path=":patientId" element={<DoctorDashboard />} />
         </Route>
 
-        {/* === 리다이렉트 설정 === */}
+        {/* 리다이렉트 설정 */}
         {/* '/' 접속 시 로그인으로 이동 */}
         <Route path="/" element={<Navigate to="/login" replace />} />
         

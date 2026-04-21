@@ -10,6 +10,9 @@ export default function DoctorLayout() {
   const [patientTab, setPatientTab] = useState('today');
   const [sortBy, setSortBy] = useState('name');
   
+  // 환자 검색을 위한 상태 추가
+  const [searchQuery, setSearchQuery] = useState('');
+  
   const [currentDate, setCurrentDate] = useState(new Date()); 
   const [selectedDate, setSelectedDate] = useState(new Date()); 
 
@@ -37,10 +40,23 @@ export default function DoctorLayout() {
 
   // 좌측 환자 리스트 필터/정렬 로직
   let displayedPatients = patients;
+
+  // 검색어 필터링 로직 (나중에 백엔드 API 호출로 변경)
+  if (searchQuery.trim()) {
+    const query = searchQuery.toLowerCase();
+    displayedPatients = displayedPatients.filter(p => 
+      p.name.toLowerCase().includes(query) || 
+      p.id.toLowerCase().includes(query) || 
+      p.age.toString().includes(query) || 
+      p.sex.includes(query)
+    );
+  }
+
+  // 정렬 로직
   if (sortBy === 'name') {
-    displayedPatients = [...patients].sort((a, b) => a.name.localeCompare(b.name));
+    displayedPatients = [...displayedPatients].sort((a, b) => a.name.localeCompare(b.name));
   } else if (sortBy === 'age') {
-    displayedPatients = [...patients].sort((a, b) => b.age - a.age); // 나이 많은 순
+    displayedPatients = [...displayedPatients].sort((a, b) => b.age - a.age); // 나이 많은 순
   }
 
   return (
@@ -86,6 +102,23 @@ export default function DoctorLayout() {
                 환자 목록
               </button>
             </div>
+
+            {/* 환자 조회 검색창 */}
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="이름, 번호, 나이, 성별 검색"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 bg-white border border-gray-200 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all shadow-sm"
+              />
+            </div>
+
             <div className="flex justify-between items-center px-1">
               <span className="text-[11px] font-bold text-gray-400">PATIENT LIST</span>
               <select 
@@ -100,27 +133,33 @@ export default function DoctorLayout() {
           </div>
 
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
-            {displayedPatients.map((p) => (
-              <button 
-                key={p.id}
-                onClick={() => navigate(`/doctor/${p.id}`)}
-                className="w-full text-left p-3 rounded-xl border border-transparent hover:border-blue-100 hover:bg-blue-50 transition-all group"
-              >
-                <div className="flex justify-between items-start">
-                  <span className="font-bold text-gray-800">{p.name}</span>
-                  <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-mono">{p.id}</span>
-                </div>
-                <div className="flex justify-between items-center mt-1">
-                  <div className="flex flex-col">
-                    <span className="text-xs text-gray-500">{p.sex}/{p.age}세</span>
-                    <span className="text-[11px] text-gray-500">최근: {p.lastDialysis}</span>
+            {displayedPatients.length > 0 ? (
+              displayedPatients.map((p) => (
+                <button 
+                  key={p.id}
+                  onClick={() => navigate(`/doctor/${p.id}`)}
+                  className="w-full text-left p-3 rounded-xl border border-transparent hover:border-blue-100 hover:bg-blue-50 transition-all group"
+                >
+                  <div className="flex justify-between items-start">
+                    <span className="font-bold text-gray-800">{p.name}</span>
+                    <span className="text-[10px] bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded font-mono">{p.id}</span>
                   </div>
-                  <span className={`text-[11px] font-bold ${p.status === 'waiting' ? 'text-orange-500' : 'text-gray-400'}`}>
-                    {p.status === 'waiting' ? `대기 (${p.time})` : '진료완료'}
-                  </span>
-                </div>
-              </button>
-            ))}
+                  <div className="flex justify-between items-center mt-1">
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-500">{p.sex}/{p.age}세</span>
+                      <span className="text-[11px] text-gray-500">최근: {p.lastDialysis}</span>
+                    </div>
+                    <span className={`text-[11px] font-bold ${p.status === 'waiting' ? 'text-orange-500' : 'text-gray-400'}`}>
+                      {p.status === 'waiting' ? `대기 (${p.time})` : '진료완료'}
+                    </span>
+                  </div>
+                </button>
+              ))
+            ) : (
+              <div className="text-center py-6 text-xs text-gray-400 font-medium">
+                검색 결과가 없습니다.
+              </div>
+            )}
           </div>
         </aside>
 
@@ -176,7 +215,7 @@ export default function DoctorLayout() {
               <span className="text-xs text-blue-600 font-bold">{scheduledPatients.length}건</span>
             </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {/* 예약 환자 리스트 (공통 데이터 연동됨) */}
+              {/* 예약 환자 리스트 */}
               {scheduledPatients.map((sch) => (
                 <div key={sch.id} className={`flex gap-3 items-start border-l-2 pl-3 py-1 ${sch.status === 'waiting' ? 'border-orange-400' : 'border-blue-200'}`}>
                   <span className={`text-xs font-bold w-10 mt-0.5 ${sch.status === 'waiting' ? 'text-orange-500' : 'text-gray-400'}`}>
@@ -197,7 +236,7 @@ export default function DoctorLayout() {
             </div>
           </div>
 
-          {/* 공통 데이터에 연동된 다음 진료 환자 알림 */}
+          {/* 다음 진료 환자 알림 */}
           {nextPatient && (
             <div className="p-4 bg-slate-900 text-white rounded-t-3xl shadow-2xl relative z-20">
               <div className="text-[10px] font-bold text-blue-400 mb-1 uppercase tracking-widest">Upcoming Next</div>
