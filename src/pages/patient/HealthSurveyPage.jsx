@@ -84,9 +84,6 @@ export default function HealthSurveyPage() {
       
       {/* 상단 타이틀 영역 */}
       <div className="mb-8">
-        <div className="text-emerald-600 font-bold mb-2 flex items-center gap-2">
-          <span className="text-xl">📋</span> 정기 검진 설문
-        </div>
         <h1 className="text-3xl font-black text-gray-900">건강 설문 조사</h1>
         <p className="text-gray-500 mt-2 font-medium leading-relaxed">
           담당 의료진이 환자분의 현재 상태를 정확히 파악하기 위한 설문입니다.<br className="hidden md:block"/>

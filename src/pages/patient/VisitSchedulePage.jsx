@@ -66,9 +66,6 @@ export default function VisitSchedulePage() {
       
       {/* 상단 타이틀 영역 */}
       <div className="mb-8">
-        <div className="text-orange-500 font-bold mb-2 flex items-center gap-2">
-          <span className="text-xl">📅</span> 방문 일정 확인
-        </div>
         <h1 className="text-3xl font-black text-gray-900">예약 및 진료 일정</h1>
         <p className="text-gray-500 mt-2 font-medium">다음 병원 방문 일정과 정기 검진 예약 현황을 확인하세요.</p>
       </div>
