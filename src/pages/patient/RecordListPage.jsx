@@ -5,7 +5,7 @@ export default function RecordListPage() {
   const [navDate, setNavDate] = useState(new Date()); 
   const [selectedDate, setSelectedDate] = useState(new Date()); 
 
-  // 1. 기존에는 고정된 변수였던 데이터를, '수정'이 가능하도록 useState(상태)로 변경했습니다.
+  // 수정 가능하도록 useState로 변경
   const [recordsData, setRecordsData] = useState([
     {
       date: '2026-04-20',
@@ -31,7 +31,7 @@ export default function RecordListPage() {
     }
   ]);
 
-  // --- 캘린더 관련 로직 ---
+  // 캘린더 관련 로직
   const year = navDate.getFullYear();
   const month = navDate.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
@@ -53,7 +53,7 @@ export default function RecordListPage() {
   const selectedDateStr = formatDate(selectedDate);
   const activeRecord = recordsData.find(r => r.date === selectedDateStr);
 
-  // --- 수정(Edit) 모달 관련 상태 및 함수 ---
+  // 수정 모달 관련 상태 및 함수
   const [editForm, setEditForm] = useState(null); // null이면 닫힘, 데이터가 있으면 열림
 
   // 수정 버튼 클릭 시 폼에 기존 데이터 채우기
@@ -70,13 +70,13 @@ export default function RecordListPage() {
   // 수정 완료(저장) 처리
   const saveEdit = () => {
     setRecordsData(prevRecords => prevRecords.map(dayRecord => {
-      // 1. 현재 수정 중인 날짜를 찾음
+      // 현재 수정 중인 날짜를 찾음
       if (dayRecord.date === editForm.dateStr) {
         const newExchanges = [...dayRecord.exchanges];
-        // 2. 제수량(uf) 다시 계산
+        // 제수량(uf) 다시 계산
         const newUf = Number(editForm.drained) - Number(editForm.infused);
         
-        // 3. 해당 회차 데이터 업데이트
+        // 해당 회차 데이터 업데이트
         newExchanges[editForm.exIndex] = {
           ...newExchanges[editForm.exIndex],
           time: editForm.time,
@@ -111,7 +111,7 @@ export default function RecordListPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         
-        {/* === 좌측: 상세 기록 섹션 === */}
+        {/* 좌측: 상세 기록 섹션 */}
         <div className="lg:col-span-2 space-y-6">
           {activeRecord ? (
             <>
@@ -184,7 +184,7 @@ export default function RecordListPage() {
           )}
         </div>
 
-        {/* === 우측: 동적 캘린더 사이드바 === */}
+        {/* 우측: 동적 캘린더 사이드바 */}
         <aside className="sticky top-6">
           <Card className="p-5 border-none shadow-md bg-white">
             
@@ -259,9 +259,7 @@ export default function RecordListPage() {
         </aside>
       </div>
 
-      {/* ==========================================
-          [모달창] 수정 모드 (editForm에 값이 있을 때만 렌더링)
-      ========================================== */}
+      {/* 수정 모드 */}
       {editForm && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in">
           <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
