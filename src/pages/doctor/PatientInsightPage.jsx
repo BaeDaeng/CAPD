@@ -2,8 +2,10 @@ import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { patientsData } from '../../api/mockPatients';
 import Sparkline from '../../components/Sparkline';
+import BackToPatientButton from '../../components/BackToPatientButton'; 
+import {ComposedChart,Bar,Line,XAxis,YAxis,CartesianGrid,ResponsiveContainer,LabelList,Cell,Tooltip} from 'recharts';
 
-// 바로가기 버튼 아이콘 (SVG)
+// 바로가기 버튼 아이콘
 const ShortcutIcon = () => (
   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -16,15 +18,15 @@ export default function PatientInsightPage() {
 
   // 1. 환자 데이터 매칭
   const patient = patientsData.find(p => p.id === id) || patientsData[0];
-  const history = patient.history; // index 0이 오늘, 29가 30일 전
+  const history = patient.history;
 
-  // 2. 상단 요약 데이터 추출 (오늘, 7일전, 30일전)
+  // 2. 상단 요약 데이터 추출
   const currentWeight = history[0].weight;
   const lastWeekWeight = history[7].weight;
   const weightDiff = (currentWeight - lastWeekWeight).toFixed(1);
   const isWeightDecreased = weightDiff <= 0;
 
-  // 꺾은선 그래프용 데이터 (최근 7일치를 과거->현재 순으로 뒤집음)
+  // 꺾은선 그래프용 데이터
   const weightHistory7Days = history.slice(0, 7).reverse().map(h => h.weight);
   const bpHistory7Days = history.slice(0, 7).reverse().map(h => h.bpSystolic);
   const ufHistory7Days = history.slice(0, 7).reverse().map(h => h.uf);
@@ -42,31 +44,39 @@ export default function PatientInsightPage() {
   const weightDiff3Days = (history[0].weight - history[3].weight).toFixed(1);
 
   return (
-    <div className="p-6 md:p-8 animate-in fade-in duration-500 h-full overflow-y-auto">
+    <div className="p-4 md:p-6 animate-in fade-in duration-500 h-full flex flex-col overflow-hidden bg-slate-50">
+
+      {/* 헤더 영역 */}
+      <div className="mb-4 flex justify-between items-end shrink-0">
+        <div>
+          <div className="text-sm font-bold text-blue-500 mb-1">PATIENT INSIGHT</div>
+          <h1 className="text-2xl font-black text-gray-900">{patient.name} 환자 상세 현황</h1>
+        </div>
+      </div>
 
       {/* --- TOP: 4열 구조 --- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4 shrink-0">
         
         {/* 1. 환자 기본 정보 */}
-        <div className="bg-slate-800 text-white p-5 rounded-2xl shadow-sm flex flex-col justify-between relative overflow-hidden">
+        <div className="bg-slate-800 text-white p-4 rounded-2xl shadow-sm flex flex-col justify-between relative overflow-hidden">
           <button 
             onClick={() => navigate(`/doctor/${id}/info`)} 
-            className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-800 rounded-lg transition-colors z-20"
+            className="absolute top-4 right-4 text-gray-400 hover:text-blue-600 p-1.5 bg-slate-800/80 rounded-lg transition-colors z-20"
             title="환자 정보 보기"
           >
             <ShortcutIcon />
           </button>
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl"></div>
-          <div className="flex items-center gap-3 mb-4 z-10">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-xl font-bold">
+          <div className="flex items-center gap-3 mb-3 z-10">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-lg font-bold">
               {patient.name.charAt(0)}
             </div>
             <div>
-              <h2 className="text-xl font-black">{patient.name}</h2>
-              <p className="text-xs text-slate-300 font-mono">{patient.id}</p>
+              <h2 className="text-lg font-black leading-tight">{patient.name}</h2>
+              <p className="text-[10px] text-slate-300 font-mono">{patient.id}</p>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-sm z-10">
+          <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-xs z-10 mt-auto">
             <div className="text-slate-400">나이/성별</div><div className="font-medium text-right">{patient.age}세 / {patient.sex}</div>
             <div className="text-slate-400">투석 시작일</div><div className="font-medium text-right">{patient.capdStartDate}</div>
             <div className="text-slate-400">담당의</div><div className="font-medium text-right">{patient.doctor}</div>
@@ -74,233 +84,211 @@ export default function PatientInsightPage() {
         </div>
 
         {/* 2. 체중 요약 */}
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between group">
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between group">
           <div>
-            <div className="text-sm font-bold text-gray-500 mb-2">최근 체중 (kg)</div>
-            <div className="flex items-end gap-2 mb-2">
-              <span className="text-3xl font-black text-gray-900">{currentWeight}</span>
-              <span className={`text-sm font-bold mb-1 ${isWeightDecreased ? 'text-blue-500' : 'text-red-500'}`}>
+            <div className="text-xs font-bold text-gray-500 mb-1">최근 체중 (kg)</div>
+            <div className="flex items-end gap-2 mb-1">
+              <span className="text-2xl font-black text-gray-900 leading-none">{currentWeight}</span>
+              <span className={`text-xs font-bold ${isWeightDecreased ? 'text-blue-500' : 'text-red-500'}`}>
                 ({weightDiff > 0 ? '+' : ''}{weightDiff}kg)
               </span>
             </div>
-            <div className="text-xs text-gray-400 font-medium">최초 투석 시: {history[29].weight} kg</div>
+            <div className="text-[10px] text-gray-400 font-medium">최초 투석 시: {history[29].weight} kg</div>
           </div>
-          <div className="mt-4 flex flex-col items-end">
-            <div className="text-[10px] text-gray-400 mb-1 opacity-0 group-hover:opacity-100 transition-opacity">최근 7일</div>
+          <div className="mt-2 flex flex-col items-end">
             <Sparkline data={weightHistory7Days} color={isWeightDecreased ? '#3b82f6' : '#ef4444'} />
           </div>
         </div>
 
         {/* 3. 혈압 요약 */}
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between group">
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between group">
           <div>
-            <div className="text-sm font-bold text-gray-500 mb-2">최근 혈압 (mmHg)</div>
-            <div className="text-3xl font-black text-gray-900 mb-4">{history[0].bp}</div>
+            <div className="text-xs font-bold text-gray-500 mb-1">최근 혈압 (mmHg)</div>
+            <div className="text-2xl font-black text-gray-900 leading-none">{history[0].bp}</div>
           </div>
-          <div className="mt-4 flex flex-col items-end">
-            <div className="text-[10px] text-gray-400 mb-1 opacity-0 group-hover:opacity-100 transition-opacity">최근 7일</div>
+          <div className="mt-2 flex flex-col items-end">
             <Sparkline data={bpHistory7Days} color="#8b5cf6" />
           </div>
         </div>
 
         {/* 4. 평균 제수량 요약 */}
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between group">
+        <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col justify-between group">
           <div>
-            <div className="text-sm font-bold text-gray-500 mb-2">최근 평균 제수량 (mL)</div>
-            <div className="text-3xl font-black text-blue-600 mb-4">+{history[0].uf}</div>
+            <div className="text-xs font-bold text-gray-500 mb-1">최근 제수량 (mL)</div>
+            <div className="text-2xl font-black text-blue-600 leading-none">+{history[0].uf}</div>
           </div>
-          <div className="mt-4 flex flex-col items-end">
-            <div className="text-[10px] text-gray-400 mb-1 opacity-0 group-hover:opacity-100 transition-opacity">최근 7일</div>
+          <div className="mt-2 flex flex-col items-end">
             <Sparkline data={ufHistory7Days} color="#0ea5e9" />
           </div>
         </div>
 
       </div>
 
-      {/* --- MIDDLE: 2열 구조 (차트, AI 분석) --- */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      {/* 중단: 2열 구조 */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 flex-[1.2] min-h-0">
         
-        {/* 5. 텍스트 겹침이 방지된 주요 활력 징후 및 제수량 혼합 그래프 */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative min-h-95 flex flex-col">
+        {/* 5. Recharts 혼합 그래프 (막대 + 선) */}
+        <div className="lg:col-span-2 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 relative h-full flex flex-col min-h-0">
           <button 
             onClick={() => navigate(`/doctor/${id}/charts`)} 
-            className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-50 rounded-lg transition-colors z-20"
+            className="absolute top-4 right-4 text-gray-400 hover:text-blue-600 p-1.5 bg-slate-50 rounded-lg transition-colors z-20"
             title="차트 상세 보기"
           >
             <ShortcutIcon />
           </button>
           
-          <h3 className="text-lg font-bold text-gray-800 mb-2">주요 활력 징후 및 제수량 추이</h3>
+          <h3 className="text-base font-bold text-gray-800 mb-2 shrink-0">주요 활력 징후 및 제수량 추이</h3>
           
-          {/* 차트 범례 */}
-          <div className="flex gap-4 text-xs font-bold mb-4">
-            <span className="flex items-center gap-1.5 text-purple-600"><div className="w-3 h-3 bg-purple-200 rounded-sm border border-purple-300"></div>체중 (kg)</span>
-            <span className="flex items-center gap-1.5 text-red-500"><div className="w-3 h-1 bg-red-500 rounded-full"></div>수축기 혈압 (mmHg)</span>
-            <span className="flex items-center gap-1.5 text-blue-500"><div className="w-3 h-1 bg-blue-500 rounded-full"></div>제수량 (mL)</span>
+          <div className="flex gap-4 text-[10px] font-bold mb-2 shrink-0">
+            <span className="flex items-center gap-1 text-purple-600"><div className="w-2.5 h-2.5 bg-purple-200 rounded-sm border border-purple-300"></div>체중</span>
+            <span className="flex items-center gap-1 text-red-500"><div className="w-2.5 h-1 bg-red-500 rounded-full"></div>수축기 혈압</span>
+            <span className="flex items-center gap-1 text-blue-500"><div className="w-2.5 h-1 bg-blue-500 rounded-full"></div>제수량</span>
           </div>
 
-          {/* SVG 혼합 차트 영역 */}
-          <div className="flex-1 relative w-full h-full mt-4 min-h-62.5">
+          {/* Recharts 컴포넌트 렌더링 영역 */}
+          <div className="flex-1 relative w-full h-full min-h-0">
             {(() => {
               const chartData = history.slice(0, 7).reverse();
-              
-              const vW = 1000; 
-              const vH = 240; 
-              
-              const minWeight = 40, maxWeight = 100;
-              const minBp = 80, maxBp = 180;
-              const minUf = 500, maxUf = 2500;
-
-              const getX = (i) => (i / (chartData.length - 1)) * (vW - 100) + 50; 
-              const getY = (val, min, max) => vH - ((val - min) / (max - min)) * vH;
-
-              const bpPoints = chartData.map((d, i) => `${getX(i)},${getY(d.bpSystolic, minBp, maxBp)}`).join(' ');
-              const ufPoints = chartData.map((d, i) => `${getX(i)},${getY(d.uf, minUf, maxUf)}`).join(' ');
 
               return (
-                <svg viewBox={`0 0 ${vW} ${vH + 60}`} className="w-full h-full absolute inset-0 overflow-visible">
-                  
-                  {/* 배경 가이드라인 */}
-                  {[0, 0.33, 0.66, 1].map(ratio => (
-                    <line key={ratio} x1="0" y1={vH * ratio} x2={vW} y2={vH * ratio} stroke="#f1f5f9" strokeWidth="2" strokeDasharray={ratio !== 1 ? "6 6" : "0"} />
-                  ))}
-
-                  {/* 1. 체중 막대 그래프 (먼저 그려서 선 그래프 뒤에 깔리게 배치) */}
-                  {chartData.map((d, i) => {
-                    const safeWeight = Math.min(Math.max(d.weight, minWeight), maxWeight);
-                    const barH = ((safeWeight - minWeight) / (maxWeight - minWeight)) * vH;
-                    return (
-                      <g key={`bar-${i}`} className="group cursor-pointer">
-                        <rect x={getX(i) - 35} y={vH - barH} width="70" height={barH} rx="8" fill="#e9d5ff" className="group-hover:fill-[#d8b4fe] transition-colors" />
-                        {/* X축 날짜 */}
-                        <text x={getX(i)} y={vH + 40} textAnchor="middle" fill="#9ca3af" fontSize="15" fontWeight="bold">
-                          {d.displayDate}
-                        </text>
-                      </g>
-                    );
-                  })}
-
-                  {/* 2. 제수량 & 혈압 선 그래프 */}
-                  <polyline points={ufPoints} fill="none" stroke="#3b82f6" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-                  <polyline points={bpPoints} fill="none" stroke="#ef4444" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" />
-
-                  {/* 3. 점과 텍스트 (최상단 레이어로 올려서 겹침 방지 로직 적용) */}
-                  {chartData.map((d, i) => {
-                    const x = getX(i);
+                <ResponsiveContainer width="100%" height="100%">
+                  {/* ComposedChart: 여러 종류의 차트를 하나로 겹쳐서 그림 */}
+                  <ComposedChart
+                    data={chartData}
+                    margin={{ top: 25, right: 10, bottom: 0, left: 10 }}
+                  >
+                    <CartesianGrid stroke="#f1f5f9" strokeDasharray="6 6" vertical={false} />
                     
-                    const safeWeight = Math.min(Math.max(d.weight, minWeight), maxWeight);
-                    const barH = ((safeWeight - minWeight) / (maxWeight - minWeight)) * vH;
+                    {/* X축 */}
+                    <XAxis 
+                      dataKey="displayDate" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: '#9ca3af', fontSize: 12, fontWeight: 'bold' }} 
+                      dy={10} 
+                    />
                     
-                    const weightY = vH - barH;
-                    const ufY = getY(d.uf, minUf, maxUf);
-                    const bpY = getY(d.bpSystolic, minBp, maxBp);
+                    {/* 데이터 툴팁 (마우스 오버 시 상세 데이터 표시) */}
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                      cursor={{ fill: '#f8fafc' }}
+                    />
 
-                    // 텍스트 기본 위치 설정 (체중:막대 위, 제수량:점 위, 혈압:점 아래)
-                    let textY_weight = weightY - 12;
-                    let textY_uf = ufY - 15;
-                    let textY_bp = bpY + 25;
+                    {/* 각각의 데이터를 독립적인 Y축 스케일로 바인딩하기 위해 숨김 처리된 YAxis 생성 */}
+                    <YAxis yAxisId="weight" domain={[40, 100]} hide />
+                    <YAxis yAxisId="uf" domain={[500, 2500]} hide />
+                    <YAxis yAxisId="bp" domain={[80, 180]} hide />
 
-                    // [충돌 방지 1] 제수량과 혈압 점이 너무 가까울 경우 (위아래로 벌려줌)
-                    if (Math.abs(textY_uf - textY_bp) < 24 || Math.abs(ufY - bpY) < 20) {
-                      if (ufY < bpY) { 
-                        // 제수량이 화면상 더 위쪽에 있을 때
-                        textY_uf = ufY - 15;
-                        textY_bp = bpY + 25;
-                      } else {
-                        textY_uf = ufY + 25;
-                        textY_bp = bpY - 15;
-                      }
-                    }
+                    {/* 1. 체중 막대 그래프 */}
+                    <Bar yAxisId="weight" dataKey="weight" name="체중 (kg)" barSize={40} radius={[6, 6, 6, 6]}>
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill="#e9d5ff" className="hover:fill-[#d8b4fe] transition-colors cursor-pointer" />
+                      ))}
+                      <LabelList 
+                        dataKey="weight" 
+                        position="top" 
+                        fill="#9333ea" 
+                        fontSize={13} 
+                        fontWeight={900} 
+                        style={{ paintOrder: 'stroke', stroke: 'white', strokeWidth: 4 }} 
+                      />
+                    </Bar>
 
-                    // [충돌 방지 2] 체중 텍스트가 다른 선이나 텍스트와 겹칠 경우
-                    if (Math.abs(textY_weight - textY_uf) < 20 || Math.abs(textY_weight - textY_bp) < 20) {
-                      // 겹치면 체중 텍스트를 막대 그래프 안쪽으로 내림
-                      textY_weight = weightY + 20; 
-                    }
+                    {/* 2. 제수량 선 그래프 */}
+                    <Line 
+                      yAxisId="uf" 
+                      type="monotone" 
+                      dataKey="uf" 
+                      name="제수량 (mL)"
+                      stroke="#3b82f6" 
+                      strokeWidth={4} 
+                      dot={{ r: 5, fill: '#3b82f6', stroke: '#fff', strokeWidth: 2 }}
+                      activeDot={{ r: 7 }}
+                    >
+                      <LabelList 
+                        dataKey="uf" 
+                        position="top" 
+                        offset={12}
+                        fill="#2563eb" 
+                        fontSize={13} 
+                        fontWeight={900} 
+                        style={{ paintOrder: 'stroke', stroke: 'white', strokeWidth: 4 }} 
+                      />
+                    </Line>
 
-                    // [후광 효과] 글자 가독성을 위해 흰색 테두리 적용
-                    const textStyle = { 
-                      paintOrder: 'stroke', 
-                      stroke: 'white', 
-                      strokeWidth: 4, 
-                      strokeLinecap: 'round', 
-                      strokeLinejoin: 'round' 
-                    };
+                    {/* 3. 혈압 선 그래프 */}
+                    <Line 
+                      yAxisId="bp" 
+                      type="monotone" 
+                      dataKey="bpSystolic" 
+                      name="수축기 혈압 (mmHg)"
+                      stroke="#ef4444" 
+                      strokeWidth={4} 
+                      dot={{ r: 5, fill: '#ef4444', stroke: '#fff', strokeWidth: 2 }}
+                      activeDot={{ r: 7 }}
+                    >
+                      <LabelList 
+                        dataKey="bpSystolic" 
+                        position="bottom" 
+                        offset={12}
+                        fill="#dc2626" 
+                        fontSize={13} 
+                        fontWeight={900} 
+                        style={{ paintOrder: 'stroke', stroke: 'white', strokeWidth: 4 }} 
+                      />
+                    </Line>
 
-                    return (
-                      <g key={`points-text-${i}`}>
-                        {/* 꺾은선 점(원) */}
-                        <circle cx={x} cy={ufY} r="7" fill="#3b82f6" stroke="#fff" strokeWidth="3" className="hover:r-9 transition-all cursor-pointer" />
-                        <circle cx={x} cy={bpY} r="7" fill="#ef4444" stroke="#fff" strokeWidth="3" className="hover:r-9 transition-all cursor-pointer" />
-                        
-                        {/* 체중 수치 텍스트 */}
-                        <text x={x} y={textY_weight} textAnchor="middle" fill="#9333ea" fontSize="14" fontWeight="900" style={textStyle}>
-                          {d.weight}
-                        </text>
-                        
-                        {/* 제수량 수치 텍스트 */}
-                        <text x={x} y={textY_uf} textAnchor="middle" fill="#2563eb" fontSize="14" fontWeight="900" style={textStyle}>
-                          {d.uf}
-                        </text>
-                        
-                        {/* 혈압 수치 텍스트 */}
-                        <text x={x} y={textY_bp} textAnchor="middle" fill="#dc2626" fontSize="14" fontWeight="900" style={textStyle}>
-                          {d.bpSystolic}
-                        </text>
-                      </g>
-                    );
-                  })}
-                  
-                </svg>
+                  </ComposedChart>
+                </ResponsiveContainer>
               );
             })()}
           </div>
         </div>
 
         {/* 6. AI 건강 상태 알림 */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative flex flex-col">
+        <div className="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 relative h-full flex flex-col min-h-0">
           <button 
-            onClick={() => navigate(`/doctor/${id}/ai_report`)} 
-            className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-50 rounded-lg transition-colors"
+            onClick={() => navigate(`/doctor/${id}/ai-report`)} 
+            className="absolute top-4 right-4 text-gray-400 hover:text-blue-600 p-1.5 bg-slate-50 rounded-lg transition-colors"
             title="AI 리포트 보기"
           >
             <ShortcutIcon />
           </button>
-          <div className="flex items-center gap-2 mb-6">
-            <span className="text-xl">🤖</span>
-            <h3 className="text-lg font-bold text-gray-800">AI 건강 상태 분석</h3>
+          <div className="flex items-center gap-2 mb-3 shrink-0">
+            <span className="text-lg">🤖</span>
+            <h3 className="text-base font-bold text-gray-800">AI 건강 상태 분석</h3>
           </div>
 
-          <div className="flex-1 flex flex-col justify-center gap-4">
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+          <div className="flex-1 flex flex-col justify-between gap-2 overflow-y-auto">
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
               <div>
-                <div className="text-xs font-bold text-gray-500 mb-1">최근 3일 제수량</div>
+                <div className="text-[11px] font-bold text-gray-500 mb-0.5">최근 3일 제수량</div>
                 <div className="text-sm font-black text-gray-900">평균 +{avgUf3Days} mL</div>
               </div>
-              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${avgUf3Days > 800 ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                <div className={`w-2 h-2 rounded-full ${avgUf3Days > 800 ? 'bg-emerald-500' : 'bg-yellow-500 animate-pulse'}`}></div> 
-                {avgUf3Days > 800 ? '안정적' : '주의 필요'}
+              <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold ${avgUf3Days > 800 ? 'bg-emerald-100 text-emerald-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                <div className={`w-1.5 h-1.5 rounded-full ${avgUf3Days > 800 ? 'bg-emerald-500' : 'bg-yellow-500 animate-pulse'}`}></div> 
+                {avgUf3Days > 800 ? '안정적' : '주의'}
               </div>
             </div>
             
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-yellow-200/50">
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl border border-yellow-200/50">
               <div>
-                <div className="text-xs font-bold text-gray-500 mb-1">최근 3일 혈압</div>
+                <div className="text-[11px] font-bold text-gray-500 mb-0.5">최근 3일 혈압</div>
                 <div className="text-sm font-black text-gray-900">평균 {history[0].bp}</div>
               </div>
-              <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${history[0].bpSystolic > 140 ? 'bg-yellow-100 text-yellow-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                <div className={`w-2 h-2 rounded-full ${history[0].bpSystolic > 140 ? 'bg-yellow-500 animate-pulse' : 'bg-emerald-500'}`}></div> 
-                {history[0].bpSystolic > 140 ? '주의 필요' : '안정적'}
+              <div className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold ${history[0].bpSystolic > 140 ? 'bg-yellow-100 text-yellow-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                <div className={`w-1.5 h-1.5 rounded-full ${history[0].bpSystolic > 140 ? 'bg-yellow-500 animate-pulse' : 'bg-emerald-500'}`}></div> 
+                {history[0].bpSystolic > 140 ? '주의' : '안정적'}
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+            <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
               <div>
-                <div className="text-xs font-bold text-gray-500 mb-1">최근 3일 체중</div>
-                <div className="text-sm font-black text-gray-900">{weightDiff3Days > 0 ? '지속적 증가' : '지속적 감소'} ({weightDiff3Days > 0 ? '+' : ''}{weightDiff3Days}kg)</div>
+                <div className="text-[11px] font-bold text-gray-500 mb-0.5">최근 3일 체중</div>
+                <div className="text-sm font-black text-gray-900">{weightDiff3Days > 0 ? '증가' : '감소'} ({weightDiff3Days > 0 ? '+' : ''}{weightDiff3Days}kg)</div>
               </div>
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-bold">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full"></div> 안정적
+              <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div> 안정적
               </div>
             </div>
           </div>
@@ -308,39 +296,39 @@ export default function PatientInsightPage() {
 
       </div>
 
-      {/* 하단: 기록 표, 설문 관리 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* --- BOTTOM: 기록 표, 설문 관리 --- */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
         
-        {/* 7. 최근 3일 투석 상세 기록 표 (동적 데이터 매핑) */}
-        <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
+        {/* 7. 기록 표 */}
+        <div className="lg:col-span-2 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 relative h-full flex flex-col min-h-0">
           <button 
             onClick={() => navigate(`/doctor/${id}/logs`)} 
-            className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-50 rounded-lg transition-colors"
+            className="absolute top-4 right-4 text-gray-400 hover:text-blue-600 p-1.5 bg-slate-50 rounded-lg transition-colors z-20"
             title="기록 전체 보기"
           >
             <ShortcutIcon />
           </button>
-          <h3 className="text-lg font-bold text-gray-800 mb-6">최근 3일 투석 상세 기록</h3>
+          <h3 className="text-base font-bold text-gray-800 mb-3 shrink-0">최근 3일 투석 상세 기록</h3>
           
-          <div className="overflow-x-auto max-h-48 overflow-y-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-gray-500 font-bold border-b border-gray-100 sticky top-0">
+          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 border-t border-gray-100">
+            <table className="w-full text-left text-xs md:text-sm">
+              <thead className="bg-slate-50 text-gray-500 font-bold sticky top-0 shadow-sm">
                 <tr>
-                  <th className="px-4 py-3 rounded-tl-lg">날짜 / 시간</th>
-                  <th className="px-4 py-3">농도</th>
-                  <th className="px-4 py-3">주입량(mL)</th>
-                  <th className="px-4 py-3">배액량(mL)</th>
-                  <th className="px-4 py-3 rounded-tr-lg">제수량</th>
+                  <th className="px-3 py-2.5">날짜 / 시간</th>
+                  <th className="px-3 py-2.5">농도</th>
+                  <th className="px-3 py-2.5">주입량(mL)</th>
+                  <th className="px-3 py-2.5">배액량(mL)</th>
+                  <th className="px-3 py-2.5">제수량</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {recent3DaysExchanges.map((ex, idx) => (
                   <tr key={idx} className="hover:bg-slate-50/50">
-                    <td className="px-4 py-3 font-medium text-gray-900">{ex.dateStr} {ex.time}</td>
-                    <td className="px-4 py-3"><span className="bg-gray-100 px-2 py-0.5 rounded text-xs font-bold text-gray-600">{ex.concentration}%</span></td>
-                    <td className="px-4 py-3 text-gray-500 font-mono">{ex.infused}</td>
-                    <td className="px-4 py-3 text-gray-500 font-mono">{ex.drained}</td>
-                    <td className="px-4 py-3 font-bold text-blue-600 font-mono">+{ex.uf}</td>
+                    <td className="px-3 py-2 font-medium text-gray-900">{ex.dateStr} {ex.time}</td>
+                    <td className="px-3 py-2"><span className="bg-gray-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-gray-600">{ex.concentration}%</span></td>
+                    <td className="px-3 py-2 text-gray-500 font-mono">{ex.infused}</td>
+                    <td className="px-3 py-2 text-gray-500 font-mono">{ex.drained}</td>
+                    <td className="px-3 py-2 font-bold text-blue-600 font-mono">+{ex.uf}</td>
                   </tr>
                 ))}
               </tbody>
@@ -349,27 +337,27 @@ export default function PatientInsightPage() {
         </div>
 
         {/* 8. 환자 설문 승인 관리 */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative flex flex-col justify-between">
+        <div className="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 relative h-full flex flex-col justify-between min-h-0">
           <button 
             onClick={() => navigate(`/doctor/${id}/questions`)} 
-            className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-50 rounded-lg transition-colors"
+            className="absolute top-4 right-4 text-gray-400 hover:text-blue-600 p-1.5 bg-slate-50 rounded-lg transition-colors z-20"
             title="설문 관리 바로가기"
           >
             <ShortcutIcon />
           </button>
-          <div>
-            <h3 className="text-lg font-bold text-gray-800 mb-2">설문 승인 및 현황</h3>
-            <p className="text-xs text-gray-500 mb-6 line-clamp-2">AI가 환자 상태를 분석하여 생성한 맞춤형 질문을 확인하고 승인하세요.</p>
+          <div className="shrink-0 mb-2">
+            <h3 className="text-base font-bold text-gray-800 mb-1">설문 승인 및 현황</h3>
+            <p className="text-[11px] text-gray-500 line-clamp-2">AI 맞춤형 질문 현황입니다.</p>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-rose-50 border border-rose-100 p-4 rounded-xl text-center cursor-pointer hover:bg-rose-100 transition-colors">
-              <div className="text-3xl font-black text-rose-600 mb-1">{Math.floor(Math.random() * 5) + 1}</div>
-              <div className="text-xs font-bold text-rose-800">승인 대기 질문</div>
+          <div className="grid grid-cols-2 gap-3 flex-1 min-h-0">
+            <div className="bg-rose-50 border border-rose-100 p-2 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-rose-100 transition-colors h-full">
+              <div className="text-2xl font-black text-rose-600 mb-1">{Math.floor(Math.random() * 5) + 1}</div>
+              <div className="text-[10px] font-bold text-rose-800">승인 대기 질문</div>
             </div>
-            <div className="bg-blue-50 border border-blue-100 p-4 rounded-xl text-center cursor-pointer hover:bg-blue-100 transition-colors">
-              <div className="text-3xl font-black text-blue-600 mb-1">{Math.floor(Math.random() * 20) + 5}</div>
-              <div className="text-xs font-bold text-blue-800">응답 완료 설문</div>
+            <div className="bg-blue-50 border border-blue-100 p-2 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-blue-100 transition-colors h-full">
+              <div className="text-2xl font-black text-blue-600 mb-1">{Math.floor(Math.random() * 20) + 5}</div>
+              <div className="text-[10px] font-bold text-blue-800">응답 완료 설문</div>
             </div>
           </div>
         </div>
