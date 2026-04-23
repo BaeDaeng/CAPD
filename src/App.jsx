@@ -19,6 +19,7 @@ import PatientSchedule from './pages/patient/VisitSchedulePage';
 
 import DoctorDashboard from './pages/doctor/DoctorHome';
 import PatientInsightPage from './pages/doctor/PatientInsightPage';
+import PatientInfoPage from './pages/doctor/PatientInfoPage';
 
 
 function App() {
@@ -51,9 +52,9 @@ function App() {
           <Route index element={<DoctorDashboard />} />
           {/* 특정 환자 선택 시의 경로 */}
           <Route path=":id" element={<PatientInsightPage />} />
-          <Route path=":id/info" element={<div>환자 정보 페이지 (예정)</div>} />
+          <Route path=":id/info" element={<PatientInfoPage />} />
           <Route path=":id/charts" element={<div>상세 차트 페이지 (예정)</div>} />
-          <Route path=":id/ai-report" element={<div>AI 리포트 페이지 (예정)</div>} />
+          <Route path=":id/ai_report" element={<div>AI 리포트 페이지 (예정)</div>} />
           <Route path=":id/logs" element={<div>전체 기록 페이지 (예정)</div>} />
           <Route path=":id/questions" element={<div>설문 관리 페이지 (예정)</div>} />
         </Route>

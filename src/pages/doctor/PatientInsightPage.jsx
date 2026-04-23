@@ -260,7 +260,7 @@ export default function PatientInsightPage() {
         {/* 6. AI 건강 상태 알림 */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative flex flex-col">
           <button 
-            onClick={() => navigate(`/doctor/${id}/ai-report`)} 
+            onClick={() => navigate(`/doctor/${id}/ai_report`)} 
             className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-50 rounded-lg transition-colors"
             title="AI 리포트 보기"
           >
