@@ -1,53 +1,61 @@
-// 환자 10명의 통합 Mock 데이터
-export const patientsData = [
-  { 
-    id: 'P001', name: '김환자', age: 62, sex: 'M', 
-    record: 4, uf: 1120, weight: 74.6, bp: '155/93', fbs: 142, ai: '혈압 상승, 제수량 감소 경고', trend: [1300, 1250, 1280, 1150, 1100, 1100, 1120], isWarning: true,
-    time: '09:30', status: 'waiting', lastDialysis: '2026.04.15 12:00'
-  },
-  { 
-    id: 'P002', name: '이환자', age: 45, sex: 'F', 
-    record: 4, uf: 1450, weight: 55.2, bp: '120/80', fbs: 95, ai: '-', trend: [1400, 1420, 1450, 1430, 1440, 1460, 1450], isWarning: false,
-    time: '10:00', status: 'done', lastDialysis: '2026.04.15 12:00'
-  },
-  { 
-    id: 'P003', name: '최환자', age: 71, sex: 'M', 
-    record: 2, uf: 650, weight: 68.1, bp: '135/85', fbs: 110, ai: '오후 기록 2건 누락', trend: [1100, 1150, 1120, 1180, 1100, 650, 650], isWarning: true,
-    time: '10:30', status: 'waiting', lastDialysis: '2026.04.15 12:00'
-  },
-  { 
-    id: 'P004', name: '박환자', age: 58, sex: 'F', 
-    record: 4, uf: 1200, weight: 60.5, bp: '125/82', fbs: 105, ai: '-', trend: [1180, 1190, 1200, 1210, 1190, 1200, 1200], isWarning: false,
-    time: '11:00', status: 'done', lastDialysis: '2026.04.15 13:30'
-  },
-  { 
-    id: 'P005', name: '정환자', age: 52, sex: 'M', 
-    record: 5, uf: 1350, weight: 72.0, bp: '130/85', fbs: 125, ai: '-', trend: [1300, 1320, 1310, 1350, 1340, 1330, 1350], isWarning: false,
-    time: '13:30', status: 'waiting', lastDialysis: '2026.04.15 08:00'
-  },
-  { 
-    id: 'P006', name: '배환자', age: 66, sex: 'F', 
-    record: 4, uf: 950, weight: 63.8, bp: '145/90', fbs: 155, ai: '공복혈당 150 초과 (3일째)', trend: [1000, 980, 950, 970, 960, 940, 950], isWarning: true,
-    time: '14:00', status: 'waiting', lastDialysis: '2026.04.15 12:30'
-  },
-  { 
-    id: 'P007', name: '임환자', age: 48, sex: 'M', 
-    record: 1, uf: 300, weight: 78.2, bp: '128/84', fbs: 100, ai: '아침 기록 확인 요망', trend: [1200, 1220, 1190, 1210, 1200, 300, 300], isWarning: true,
-    time: '14:30', status: 'done', lastDialysis: '2026.04.15 07:00'
-  },
-  { 
-    id: 'P008', name: '윤환자', age: 55, sex: 'F', 
-    record: 4, uf: 1250, weight: 58.9, bp: '118/78', fbs: 92, ai: '-', trend: [1230, 1240, 1260, 1250, 1240, 1250, 1250], isWarning: false,
-    time: '15:00', status: 'waiting', lastDialysis: '2026.04.15 12:00'
-  },
-  { 
-    id: 'P009', name: '오환자', age: 69, sex: 'M', 
-    record: 4, uf: 1500, weight: 70.4, bp: '122/80', fbs: 108, ai: '-', trend: [1480, 1490, 1510, 1500, 1480, 1490, 1500], isWarning: false,
-    time: '15:30', status: 'done', lastDialysis: '2026.04.15 12:00'
-  },
-  { 
-    id: 'P010', name: '신환자', age: 41, sex: 'F', 
-    record: 3, uf: 980, weight: 52.1, bp: '115/75', fbs: 88, ai: '야간 기록 지연', trend: [1300, 1280, 1310, 1290, 1300, 980, 980], isWarning: true,
-    time: '16:00', status: 'waiting', lastDialysis: '2026.04.15 12:00'
-  },
+// 30일치 가짜 투석/건강 데이터를 생성하는 헬퍼 함수
+const generateHistory = (baseWeight) => {
+  const history = [];
+  let currentWeight = baseWeight;
+  const today = new Date('2026-04-22'); // 기준일
+
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const monthDay = `${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    // 약간의 랜덤 변동 추가
+    currentWeight += (Math.random() - 0.5) * 0.6; 
+    const sys = Math.floor(120 + Math.random() * 20); // 수축기 혈압 (120~139)
+    const dia = Math.floor(80 + Math.random() * 15);  // 이완기 혈압 (80~94)
+    const uf = Math.floor(800 + Math.random() * 500); // 제수량 (800~1299)
+
+    history.push({
+      date: dateStr,
+      displayDate: monthDay,
+      weight: Number(currentWeight.toFixed(1)),
+      bpSystolic: sys,
+      bpDiastolic: dia,
+      bp: `${sys}/${dia}`,
+      uf: uf,
+      // 가상의 매 회차(4회) 교환 데이터
+      exchanges: [
+        { time: '08:30', concentration: '1.5', infused: 2000, drained: 2000 + Math.floor(uf * 0.3), uf: Math.floor(uf * 0.3) },
+        { time: '13:00', concentration: '2.5', infused: 2000, drained: 2000 + Math.floor(uf * 0.4), uf: Math.floor(uf * 0.4) },
+        { time: '18:15', concentration: '1.5', infused: 2000, drained: 2000 + Math.floor(uf * 0.2), uf: Math.floor(uf * 0.2) },
+        { time: '22:40', concentration: '2.5', infused: 2000, drained: 2000 + Math.floor(uf * 0.1), uf: Math.floor(uf * 0.1) },
+      ]
+    });
+  }
+  return history; // index 0이 오늘(가장 최신), 29가 한 달 전
+};
+
+// 기본 환자 10명 명단 생성
+const basePatients = [
+  { id: 'P001', name: '김환자', sex: '남', age: 45, time: '09:00', status: 'waiting', bloodType: 'A+', capdStartDate: '2025-01-15', doctor: '이의사', baseWeight: 65 },
+  { id: 'P002', name: '이환자', sex: '여', age: 52, time: '09:30', status: 'waiting', bloodType: 'B+', capdStartDate: '2024-11-20', doctor: '김의사', baseWeight: 58 },
+  { id: 'P003', name: '박환자', sex: '남', age: 61, time: '10:00', status: 'completed', bloodType: 'O+', capdStartDate: '2023-05-10', doctor: '최의사', baseWeight: 72 },
+  { id: 'P004', name: '최환자', sex: '여', age: 38, time: '10:30', status: 'waiting', bloodType: 'AB+', capdStartDate: '2026-02-01', doctor: '이의사', baseWeight: 55 },
+  { id: 'P005', name: '배환자', sex: '남', age: 70, time: '11:00', status: 'completed', bloodType: 'A+', capdStartDate: '2022-08-14', doctor: '김의사', baseWeight: 68 },
+  { id: 'P006', name: '강환자', sex: '여', age: 48, time: '13:30', status: 'waiting', bloodType: 'B-', capdStartDate: '2025-07-22', doctor: '최의사', baseWeight: 60 },
+  { id: 'P007', name: '조환자', sex: '남', age: 55, time: '14:00', status: 'waiting', bloodType: 'O+', capdStartDate: '2024-03-05', doctor: '이의사', baseWeight: 75 },
+  { id: 'P008', name: '윤환자', sex: '여', age: 63, time: '14:30', status: 'completed', bloodType: 'A-', capdStartDate: '2025-10-11', doctor: '김의사', baseWeight: 62 },
+  { id: 'P009', name: '임환자', sex: '남', age: 41, time: '15:00', status: 'waiting', bloodType: 'AB+', capdStartDate: '2026-01-30', doctor: '최의사', baseWeight: 70 },
+  { id: 'P010', name: '한환자', sex: '여', age: 59, time: '15:30', status: 'completed', bloodType: 'O-', capdStartDate: '2023-12-01', doctor: '이의사', baseWeight: 53 },
 ];
+
+// 각 환자에게 30일치 데이터와 DoctorHome용 lastDialysis 필드 부착
+export const patientsData = basePatients.map(patient => {
+  const history = generateHistory(patient.baseWeight);
+  return {
+    ...patient,
+    history,
+    lastDialysis: history[0].date, // 오늘 날짜를 마지막 투석일로 지정
+  };
+});

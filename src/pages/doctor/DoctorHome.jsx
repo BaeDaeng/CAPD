@@ -2,19 +2,48 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../../components/Card';
 import { patientsData } from '../../api/mockPatients'; // 공통 데이터 불러오기
+import Sparkline from '../../components/Sparkline';
 
 export default function DoctorHome() {
   const navigate = useNavigate();
 
-  // 상단 압축형 요약 데이터
-  const summaryStats = {
-    total: patientsData.length, // 데이터 배열 길이에 맞게 연동
-    normal: patientsData.filter(p => p.record >= 4).length,   // 4회 이상이면 정상 제출
-    delayed: patientsData.filter(p => p.record < 4).length    // 4회 미만이면 제출 지연/누락
-  };
+  const patientList = patientsData.map(p => {
+    const todayData = p.history && p.history.length > 0 ? p.history[0] : {};
+    const bp = todayData.bp || "120/80";
+    const sys = parseInt(bp.split('/')[0]) || 120;
+    const uf = todayData.uf || 0;
+    const fbs = todayData.fbs || 100;
+    const weight = todayData.weight || p.baseWeight || 60;
+    const recordCount = todayData.exchanges ? todayData.exchanges.length : 0;
+    
+    // 위험/주의 상태 판별 (혈압 140이상, 혈당 126이상, 제수량 800미만, 투석 4회 미만)
+    const isWarning = sys >= 140 || fbs >= 126 || uf < 800 || recordCount < 4;
+    
+    let aiMsg = "안정적 (특이사항 없음)";
+    if (recordCount < 4) aiMsg = "투석 횟수 부족 주의";
+    else if (sys >= 140) aiMsg = "수축기 혈압 높음 주의";
+    else if (fbs >= 126) aiMsg = "공복혈당 높음 주의";
+    else if (uf < 800) aiMsg = "제수량 부족 주의";
 
-  // mock data 호출
-  const patientList = patientsData;
+    return {
+      ...p,
+      record: recordCount,
+      uf: uf,
+      weight: weight,
+      bp: bp,
+      fbs: fbs,
+      ai: aiMsg,
+      trend: p.history ? p.history.slice(0, 7).reverse().map(h => h.uf) : [],
+      isWarning: isWarning
+    };
+  });
+
+  // 상단 압축형 요약 데이터 (가공된 patientList 기준으로 계산)
+  const summaryStats = {
+    total: patientList.length, 
+    normal: patientList.filter(p => p.record >= 4).length,   // 4회 이상이면 정상 제출
+    delayed: patientList.filter(p => p.record < 4).length    // 4회 미만이면 제출 지연/누락
+  };
 
   return (
     <div className="h-full flex flex-col p-6 animate-in fade-in duration-500 bg-slate-100">
@@ -135,35 +164,5 @@ export default function DoctorHome() {
       </Card>
       
     </div>
-  );
-}
-
-// 미니 추이 그래프(Sparkline)
-function Sparkline({ data, color }) {
-  if (!data || data.length === 0) return null;
-  const max = Math.max(...data);
-  const min = Math.min(...data);
-  const range = max - min || 1;
-  const height = 20;
-  const width = 80;
-
-  const points = data.map((d, i) => {
-    const x = (i / (data.length - 1)) * width;
-    const y = height - ((d - min) / range) * height;
-    return `${x},${y}`;
-  }).join(' ');
-
-  return (
-    <svg width={width} height={height} className="overflow-visible">
-      <polyline
-        fill="none"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        points={points}
-        className="opacity-80 group-hover:opacity-100 transition-opacity"
-      />
-    </svg>
   );
 }

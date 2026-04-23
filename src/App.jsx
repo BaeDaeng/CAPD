@@ -1,20 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-// import useAppStore from './store/useAppStore';
 
 // 공통 및 인증 페이지
 import LoginPage from './pages/LoginPage';
-import DoctorRegister from './pages/DoctorRegister'; // 파일명 오타(Doctore) 주의
+import DoctorRegister from './pages/DoctorRegister';
 import PatientRegister from './pages/PatientRegister';
 
 // 레이아웃 컴포넌트
 import PatientLayout from './layouts/PatientLayout';
 import DoctorLayout from './layouts/DoctorLayout';
 
-/** * 실제 페이지 파일이 없을 경우 에러가 나므로, 
- * 임시 컴포넌트를 만들어 에러를 방지합니다. 
- * 나중에 실제 파일을 만드시면 이 부분을 지우고 상단에서 import 하세요.
- */
 import PatientDashboard from './pages/patient/PatientHome';
 import PatientRecord from './pages/patient/DailyRecordPage';
 import PatientRecordList from './pages/patient/RecordListPage';
@@ -23,7 +18,8 @@ import PatientChat from './pages/patient/SymptomHelperPage';
 import PatientSchedule from './pages/patient/VisitSchedulePage';
 
 import DoctorDashboard from './pages/doctor/DoctorHome';
-// const DoctorDashboard = () => <div className="p-8 text-2xl font-bold">의사 EMR 대시보드 </div>;
+import PatientInsightPage from './pages/doctor/PatientInsightPage';
+
 
 function App() {
   // 현재 로그인한 사용자의 정보를 가져옵니다. (ESLint 경고 방지를 위해 주석 처리하거나 사용하세요)
@@ -40,7 +36,7 @@ function App() {
         <Route path="/register/doctor" element={<DoctorRegister />} />
         <Route path="/register/patient" element={<PatientRegister />} />
 
-        {/* === 환자 전용 경로 (PatientLayout 적용) === */}
+        {/* 환자 전용 경로 (PatientLayout 적용) */}
         <Route path="/patient" element={<PatientLayout />}>
           <Route index element={<PatientDashboard />} />
           <Route path="record" element={<PatientRecord />} />
@@ -54,7 +50,12 @@ function App() {
         <Route path="/doctor" element={<DoctorLayout />}>
           <Route index element={<DoctorDashboard />} />
           {/* 특정 환자 선택 시의 경로 */}
-          <Route path=":patientId" element={<DoctorDashboard />} />
+          <Route path=":id" element={<PatientInsightPage />} />
+          <Route path=":id" element={<div>환자 정보 페이지 (예정)</div>} />
+          <Route path="charts" element={<div>상세 차트 페이지 (예정)</div>} />
+          <Route path="ai-report" element={<div>AI 리포트 페이지 (예정)</div>} />
+          <Route path="logs" element={<div>전체 기록 페이지 (예정)</div>} />
+          <Route path="questions" element={<div>설문 관리 페이지 (예정)</div>} />
         </Route>
 
         {/* 리다이렉트 설정 */}

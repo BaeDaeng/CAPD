@@ -8,7 +8,7 @@ export default function RecordListPage() {
   // 가짜 데이터
   const [recordsData, setRecordsData] = useState([
     {
-      date: '2026-04-22',
+      date: '2026-04-24',
       totalUf: 1150, // 총 제수량(자동 계산)
       bp: '128/84',  // 혈압
       weight: 65.5,  // 체중
@@ -24,7 +24,7 @@ export default function RecordListPage() {
       ]
     },
     {
-      date: '2026-04-21',
+      date: '2026-04-23',
       totalUf: 950,
       bp: '142/95',
       weight: 66.1,

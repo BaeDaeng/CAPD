@@ -212,7 +212,7 @@ export default function DailyRecordPage() {
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
           <h2 className="text-lg font-bold text-gray-800 mb-5 pb-3 border-b border-gray-100 flex justify-between items-center">
             <span className="flex items-center gap-2"><span className="text-emerald-500">❤️</span> 일일 건강 수치</span>
-            <span className="text-[10px] text-gray-400 font-normal">자동 임시저장됨</span>
+            <span className="text-[10px] text-gray-400 font-normal"></span>
           </h2>
           
           <div className="space-y-5">
@@ -273,15 +273,33 @@ export default function DailyRecordPage() {
           />
         </div>
 
-        {/* 최종 제출 버튼 */}
-        <button 
-          type="button" 
-          onClick={handleSubmitAll} 
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-lg py-5 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2"
-        >
-          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-          오늘 하루 기록 마감하기
-        </button>
+        {/* 하단 액션 버튼 영역 */}
+        <div className="flex flex-col gap-3">
+          {/* 임시 저장 버튼 */}
+          <button 
+            type="button" 
+            onClick={() => {
+              // 자동 저장 중이지만, 사용자가 버튼을 눌렀을 때도 명시적으로 저장 및 알림 제공
+              localStorage.setItem(`capd_daily_info_${formattedDate}`, JSON.stringify(dailyInfo));
+              localStorage.setItem(`capd_exchanges_${formattedDate}`, JSON.stringify(exchanges));
+              alert('현재까지 입력한 내용이 임시 저장되었습니다.');
+            }}
+            className="w-full bg-white hover:bg-slate-50 text-blue-600 border border-blue-200 font-bold text-base py-4 rounded-2xl shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+            임시 저장하기
+          </button>
+
+          {/* 최종 제출 버튼 */}
+          <button 
+            type="button" 
+            onClick={handleSubmitAll} 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-lg py-5 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2"
+          >
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+            오늘 하루 기록 마감하기
+          </button>
+        </div>
 
       </div>
     </div>
