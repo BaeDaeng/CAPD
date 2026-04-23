@@ -50,7 +50,7 @@ export default function PatientInsightPage() {
         {/* 1. 환자 기본 정보 */}
         <div className="bg-slate-800 text-white p-5 rounded-2xl shadow-sm flex flex-col justify-between relative overflow-hidden">
           <button 
-            onClick={() => navigate('/doctor/info')} 
+            onClick={() => navigate(`/doctor/${id}/info`)} 
             className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-800 rounded-lg transition-colors z-20"
             title="환자 정보 보기"
           >
@@ -123,7 +123,7 @@ export default function PatientInsightPage() {
         {/* 5. 텍스트 겹침이 방지된 주요 활력 징후 및 제수량 혼합 그래프 */}
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative min-h-95 flex flex-col">
           <button 
-            onClick={() => navigate('/doctor/charts')} 
+            onClick={() => navigate(`/doctor/${id}/charts`)} 
             className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-50 rounded-lg transition-colors z-20"
             title="차트 상세 보기"
           >
@@ -260,7 +260,7 @@ export default function PatientInsightPage() {
         {/* 6. AI 건강 상태 알림 */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative flex flex-col">
           <button 
-            onClick={() => navigate('/doctor/ai-report')} 
+            onClick={() => navigate(`/doctor/${id}/ai-report`)} 
             className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-50 rounded-lg transition-colors"
             title="AI 리포트 보기"
           >
@@ -314,7 +314,7 @@ export default function PatientInsightPage() {
         {/* 7. 최근 3일 투석 상세 기록 표 (동적 데이터 매핑) */}
         <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative">
           <button 
-            onClick={() => navigate('/doctor/logs')} 
+            onClick={() => navigate(`/doctor/${id}/logs`)} 
             className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-50 rounded-lg transition-colors"
             title="기록 전체 보기"
           >
@@ -351,7 +351,7 @@ export default function PatientInsightPage() {
         {/* 8. 환자 설문 승인 관리 */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative flex flex-col justify-between">
           <button 
-            onClick={() => navigate('/doctor/questions')} 
+            onClick={() => navigate(`/doctor/${id}/questions`)} 
             className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-50 rounded-lg transition-colors"
             title="설문 관리 바로가기"
           >
