@@ -50,7 +50,7 @@ export default function PatientInsightPage() {
         {/* 1. 환자 기본 정보 */}
         <div className="bg-slate-800 text-white p-5 rounded-2xl shadow-sm flex flex-col justify-between relative overflow-hidden">
           <button 
-            onClick={() => navigate('/doctor/charts')} 
+            onClick={() => navigate('/doctor/info')} 
             className="absolute top-5 right-5 text-gray-400 hover:text-blue-600 p-2 bg-slate-800 rounded-lg transition-colors z-20"
             title="환자 정보 보기"
           >
@@ -308,7 +308,7 @@ export default function PatientInsightPage() {
 
       </div>
 
-      {/* --- BOTTOM: 2열 구조 (기록 표, 설문 관리) --- */}
+      {/* 하단: 기록 표, 설문 관리 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* 7. 최근 3일 투석 상세 기록 표 (동적 데이터 매핑) */}

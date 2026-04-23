@@ -51,7 +51,7 @@ function App() {
           <Route index element={<DoctorDashboard />} />
           {/* 특정 환자 선택 시의 경로 */}
           <Route path=":id" element={<PatientInsightPage />} />
-          <Route path=":id" element={<div>환자 정보 페이지 (예정)</div>} />
+          <Route path="info" element={<div>환자 정보 페이지 (예정)</div>} />
           <Route path="charts" element={<div>상세 차트 페이지 (예정)</div>} />
           <Route path="ai-report" element={<div>AI 리포트 페이지 (예정)</div>} />
           <Route path="logs" element={<div>전체 기록 페이지 (예정)</div>} />

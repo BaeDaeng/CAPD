@@ -17,14 +17,14 @@ export default function DailyRecordPage() {
       turbidity: parsed.turbidity || '맑음',
       urineCount: parsed.urineCount || '',
       weight: parsed.weight || '',
-      bpSystolic: parsed.bpSystolic || '',
+      bpSystolic: parsed.bpSystolic || '', 
       bpDiastolic: parsed.bpDiastolic || '',
       fbs: parsed.fbs || '',
       memo: parsed.memo || '',
     };
   });
 
-  // 일일 정보가 바뀔 때마다 로컬 스토리지에 자동 저장
+  // 로컬 스토리지 실시간 백업 유지
   useEffect(() => {
     localStorage.setItem(`capd_daily_info_${formattedDate}`, JSON.stringify(dailyInfo));
   }, [dailyInfo, formattedDate]);
@@ -32,6 +32,31 @@ export default function DailyRecordPage() {
   const handleDailyChange = (e) => {
     const { name, value } = e.target;
     setDailyInfo(prev => ({ ...prev, [name]: value }));
+  };
+
+  // 백그라운드 임시저장 API 호출 함수
+  const triggerAutoSaveAPI = (infoData) => {
+    const autoSavePayload = {
+      date: formattedDate,
+      ...infoData,
+      exchanges: [], // 요청하신 대로 세션 데이터는 비워서 보냅니다.
+    };
+    
+    // TODO: 백엔드 API 연동 위치
+    // axios.post('/api/patients/daily-records/auto-save', autoSavePayload);
+    console.log('✅ [백그라운드 임시저장 API 호출됨]:', autoSavePayload);
+  };
+
+  // 입력이 끝났을 때(포커스가 벗어났을 때) 실행될 핸들러
+  const handleBlur = () => {
+    triggerAutoSaveAPI(dailyInfo);
+  };
+
+  // 버튼 클릭으로 바로 상태가 변하는 항목을 위한 핸들러
+  const handleTurbidityClick = (v) => {
+    const updatedInfo = { ...dailyInfo, turbidity: v };
+    setDailyInfo(updatedInfo);
+    triggerAutoSaveAPI(updatedInfo); // 업데이트된 최신 상태로 즉시 쏘기
   };
 
   // 투석 교환 기록
@@ -60,7 +85,6 @@ export default function DailyRecordPage() {
 
   // 회차 추가 버튼 클릭 시 배열에 추가
   const handleAddExchange = () => {
-    // 5회 초과 차단 로직
     if (exchanges.length >= 5) {
       alert('하루 최대 5회까지만 추가할 수 있습니다.');
       return;
@@ -80,16 +104,14 @@ export default function DailyRecordPage() {
 
     const newExchangesList = [...exchanges, newExchange];
     
-    // 시간순으로 정렬해서 저장
     newExchangesList.sort((a, b) => a.time.localeCompare(b.time));
     
     setExchanges(newExchangesList);
     localStorage.setItem(`capd_exchanges_${formattedDate}`, JSON.stringify(newExchangesList));
 
-    // 입력 폼 초기화 (시간만 현재 시간으로, 나머지는 비움)
     const now = new Date();
     const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    setCurrentExchange({ time: timeString, concentration: '1.5', infused: '', drained: '' });
+    setCurrentExchange({ time: timeString, concentration: '1.5', infused: '2000', drained: '' });
   };
 
   // 특정 회차 삭제
@@ -101,13 +123,11 @@ export default function DailyRecordPage() {
 
   // 최종 제출
   const handleSubmitAll = () => {
-    // 4회 미만 제출 시 경고 알림 로직
     if (exchanges.length < 4) {
       const confirmUnder = window.confirm(`현재 투석 횟수가 ${exchanges.length}회로 기준(4회) 미달입니다. 그래도 제출하시겠습니까?`);
       if (!confirmUnder) return;
     }
 
-    // TODO: 백엔드 API가 연결되면 아래 데이터를 서버로 POST 함
     const finalDataToSubmit = {
       date: formattedDate,
       ...dailyInfo,
@@ -118,7 +138,6 @@ export default function DailyRecordPage() {
     console.log('최종 제출 데이터:', finalDataToSubmit);
     alert('오늘 하루의 기록이 성공적으로 제출되었습니다!');
     
-    // 제출 후 로컬 스토리지 초기화 (현재는 유지하도록 둠)
     navigate('/patient/record_list');
   };
 
@@ -142,7 +161,6 @@ export default function DailyRecordPage() {
             <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded font-bold">오늘 {exchanges.length}회 기록됨</span>
           </h2>
           
-          {/* 입력 폼 */}
           <div className="space-y-5 bg-slate-50/50 p-4 rounded-xl border border-gray-100 mb-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -185,7 +203,6 @@ export default function DailyRecordPage() {
             </div>
           </div>
 
-          {/* 추가된 회차 목록 표시 */}
           {exchanges.length > 0 && (
             <div className="space-y-2">
               <div className="text-xs font-bold text-gray-400 mb-2 px-1">기록된 내역 (총 {exchanges.reduce((acc, curr) => acc + curr.uf, 0)}mL)</div>
@@ -208,38 +225,38 @@ export default function DailyRecordPage() {
           )}
         </div>
 
-        {/* 일일 건강 수치 */}
+        {/* 일일 건강 수치 (onBlur 적용) */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
           <h2 className="text-lg font-bold text-gray-800 mb-5 pb-3 border-b border-gray-100 flex justify-between items-center">
             <span className="flex items-center gap-2"><span className="text-emerald-500">❤️</span> 일일 건강 수치</span>
-            <span className="text-[10px] text-gray-400 font-normal"></span>
+            <span className="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-1 rounded-full">자동 저장 중</span>
           </h2>
           
           <div className="space-y-5">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">체중 (kg)</label>
-                <input type="number" step="0.1" name="weight" value={dailyInfo.weight} onChange={handleDailyChange} placeholder="00.0" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input type="number" step="0.1" name="weight" value={dailyInfo.weight} onChange={handleDailyChange} onBlur={handleBlur} placeholder="00.0" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">소변 횟수 (회)</label>
-                <input type="number" name="urineCount" value={dailyInfo.urineCount} onChange={handleDailyChange} placeholder="0" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input type="number" name="urineCount" value={dailyInfo.urineCount} onChange={handleDailyChange} onBlur={handleBlur} placeholder="0" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">혈압 (mmHg)</label>
               <div className="flex items-center gap-3">
-                <input type="number" name="bpSystolic" value={dailyInfo.bpSystolic} onChange={handleDailyChange} placeholder="수축기" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input type="number" name="bpSystolic" value={dailyInfo.bpSystolic} onChange={handleDailyChange} onBlur={handleBlur} placeholder="수축기" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
                 <span className="text-gray-300">/</span>
-                <input type="number" name="bpDiastolic" value={dailyInfo.bpDiastolic} onChange={handleDailyChange} placeholder="이완기" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input type="number" name="bpDiastolic" value={dailyInfo.bpDiastolic} onChange={handleDailyChange} onBlur={handleBlur} placeholder="이완기" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">공복혈당 (mg/dL)</label>
-                <input type="number" name="fbs" value={dailyInfo.fbs} onChange={handleDailyChange} placeholder="000" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
+                <input type="number" name="fbs" value={dailyInfo.fbs} onChange={handleDailyChange} onBlur={handleBlur} placeholder="000" className="w-full bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none" />
               </div>
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">복막액 혼탁도</label>
@@ -247,7 +264,7 @@ export default function DailyRecordPage() {
                   {['맑음', '혼탁'].map((v) => (
                     <button
                       key={v} type="button"
-                      onClick={() => setDailyInfo(prev => ({ ...prev, turbidity: v }))}
+                      onClick={() => handleTurbidityClick(v)}
                       className={`rounded-xl font-bold border transition-all ${dailyInfo.turbidity === v ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-500 border-gray-200'}`}
                     >
                       {v}
@@ -259,7 +276,7 @@ export default function DailyRecordPage() {
           </div>
         </div>
 
-        {/* 메모 */}
+        {/* 메모 (onBlur 적용) */}
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
           <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
             <span className="text-yellow-500">📝</span> 하루 메모
@@ -268,38 +285,21 @@ export default function DailyRecordPage() {
             name="memo"
             value={dailyInfo.memo}
             onChange={handleDailyChange}
+            onBlur={handleBlur}
             placeholder="오늘의 특이사항이나 컨디션을 적어주세요."
             className="w-full h-24 bg-slate-50 border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none resize-none"
           />
         </div>
 
-        {/* 하단 액션 버튼 영역 */}
-        <div className="flex flex-col gap-3">
-          {/* 임시 저장 버튼 */}
-          <button 
-            type="button" 
-            onClick={() => {
-              // 자동 저장 중이지만, 사용자가 버튼을 눌렀을 때도 명시적으로 저장 및 알림 제공
-              localStorage.setItem(`capd_daily_info_${formattedDate}`, JSON.stringify(dailyInfo));
-              localStorage.setItem(`capd_exchanges_${formattedDate}`, JSON.stringify(exchanges));
-              alert('현재까지 입력한 내용이 임시 저장되었습니다.');
-            }}
-            className="w-full bg-white hover:bg-slate-50 text-blue-600 border border-blue-200 font-bold text-base py-4 rounded-2xl shadow-sm transition-all active:scale-95 flex items-center justify-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
-            임시 저장하기
-          </button>
-
-          {/* 최종 제출 버튼 */}
-          <button 
-            type="button" 
-            onClick={handleSubmitAll} 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-lg py-5 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2"
-          >
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-            오늘 하루 기록 마감하기
-          </button>
-        </div>
+        {/* 최종 제출 버튼 */}
+        <button 
+          type="button" 
+          onClick={handleSubmitAll} 
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-lg py-5 rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center gap-2"
+        >
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+          오늘 하루 기록 마감하기
+        </button>
 
       </div>
     </div>
