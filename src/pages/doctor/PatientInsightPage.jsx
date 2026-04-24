@@ -54,7 +54,7 @@ export default function PatientInsightPage() {
         </div>
       </div>
 
-      {/* --- TOP: 4열 구조 --- */}
+      {/* 상단: 4열 구조 */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-4 shrink-0">
         
         {/* 1. 환자 기본 정보 */}
@@ -248,9 +248,9 @@ export default function PatientInsightPage() {
         {/* 6. AI 건강 상태 알림 */}
         <div className="bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 relative h-full flex flex-col min-h-0">
           <button 
-            onClick={() => navigate(`/doctor/${id}/ai-report`)} 
+            onClick={() => navigate(`/doctor/${id}/ai_report`)} 
             className="absolute top-4 right-4 text-gray-400 hover:text-blue-600 p-1.5 bg-slate-50 rounded-lg transition-colors"
-            title="AI 리포트 보기"
+            title="AI 주간 보고서 보기"
           >
             <ShortcutIcon />
           </button>
@@ -296,7 +296,7 @@ export default function PatientInsightPage() {
 
       </div>
 
-      {/* --- BOTTOM: 기록 표, 설문 관리 --- */}
+      {/* 하단: 기록 표, 설문 관리 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
         
         {/* 7. 기록 표 */}

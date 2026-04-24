@@ -123,11 +123,21 @@ export default function DailyRecordPage() {
 
   // 최종 제출
   const handleSubmitAll = () => {
+    // 4회 미만 제출 시 경고 알림 로직
     if (exchanges.length < 4) {
       const confirmUnder = window.confirm(`현재 투석 횟수가 ${exchanges.length}회로 기준(4회) 미달입니다. 그래도 제출하시겠습니까?`);
       if (!confirmUnder) return;
     }
 
+    // 제출 시 수정 불가 경고창
+    const confirmFinalSubmit = window.confirm(
+      "오늘 하루 기록 마감하기 버튼 클릭 시 제출 후에는 수정이 불가능 합니다.\n그래도 제출하시겠습니까?\n\n(지금까지 작성한 내용은 자동 저장되고 있습니다)"
+    );
+
+    // 사용자가 취소를 누르면 제출 안 함
+    if (!confirmFinalSubmit) return;
+
+    // TODO: 백엔드 API가 연결되면 아래 데이터를 서버로 POST/PUT 함
     const finalDataToSubmit = {
       date: formattedDate,
       ...dailyInfo,
