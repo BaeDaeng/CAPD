@@ -111,102 +111,101 @@ export default function AiReportPage() {
         </div>
 
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 xl:grid-cols-12">
-          <aside className="min-h-0 xl:col-span-4">
-            <Card className="flex h-full min-h-0 flex-col border-none p-5 shadow-sm">
-              <div className="shrink-0">
-                <h3 className="mb-4 text-sm font-black text-gray-800">보고서 조건</h3>
+          {/* 💡 aside 영역: 스크롤 추가 및 내부 카드를 내용에 맞게 줄임(h-fit) */}
+          <aside className="min-h-0 xl:col-span-4 overflow-y-auto custom-scrollbar pr-1">
+            <Card className="flex h-fit flex-col border-none p-5 shadow-sm">
+              <h3 className="mb-4 text-sm font-black text-gray-800">보고서 조건</h3>
 
-                <div className="mb-4 grid grid-cols-3 gap-2">
-                  {reportTypes.map(type => (
-                    <button
-                      key={type.id}
-                      onClick={() => setReportType(type.id)}
-                      className={`rounded-xl py-2.5 text-xs font-black transition-all ${
-                        reportType === type.id
-                          ? 'bg-indigo-600 text-white shadow-md'
-                          : 'border border-gray-100 bg-slate-50 text-gray-500 hover:bg-indigo-50 hover:text-indigo-600'
-                      }`}
-                    >
-                      {type.label}
-                    </button>
-                  ))}
-                </div>
-
-                {reportType === 'weekly' && (
-                  <ConditionBox
-                    title="최근 7일 주간 보고서"
-                    description={`${history[6]?.date || '-'} ~ ${history[0]?.date || '-'} 기록을 기준으로 분석합니다.`}
-                  />
-                )}
-
-                {reportType === 'monthly' && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <FieldLabel label="월 선택">
-                      <select
-                        value={selectedMonth}
-                        onChange={(e) => {
-                          setSelectedMonth(e.target.value);
-                          setSelectedWeek('1');
-                        }}
-                        className="w-full rounded-xl border border-gray-200 bg-slate-50 px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
-                      >
-                        {monthOptions.map(month => (
-                          <option key={month} value={month}>{month}</option>
-                        ))}
-                      </select>
-                    </FieldLabel>
-
-                    <FieldLabel label="주차 선택">
-                      <select
-                        value={selectedWeek}
-                        onChange={(e) => setSelectedWeek(e.target.value)}
-                        className="w-full rounded-xl border border-gray-200 bg-slate-50 px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
-                      >
-                        {Object.keys(monthlyWeekGroups).map(week => (
-                          <option key={week} value={week}>{week}주차</option>
-                        ))}
-                      </select>
-                    </FieldLabel>
-                  </div>
-                )}
-
-                {reportType === 'custom' && (
-                  <div className="grid grid-cols-2 gap-3">
-                    <FieldLabel label="시작일">
-                      <input
-                        type="date"
-                        value={customStartDate}
-                        onChange={(e) => setCustomStartDate(e.target.value)}
-                        className="w-full rounded-xl border border-gray-200 bg-slate-50 px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                    </FieldLabel>
-
-                    <FieldLabel label="종료일">
-                      <input
-                        type="date"
-                        value={customEndDate}
-                        onChange={(e) => setCustomEndDate(e.target.value)}
-                        className="w-full rounded-xl border border-gray-200 bg-slate-50 px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
-                      />
-                    </FieldLabel>
-                  </div>
-                )}
-
-                <button
-                  onClick={handleGenerateReport}
-                  className="mt-4 w-full rounded-xl bg-slate-900 py-3 text-sm font-black text-white transition-colors hover:bg-slate-800"
-                >
-                  보고서 생성
-                </button>
+              <div className="mb-4 grid grid-cols-3 gap-2">
+                {reportTypes.map(type => (
+                  <button
+                    key={type.id}
+                    onClick={() => setReportType(type.id)}
+                    className={`rounded-xl py-2.5 text-xs font-black transition-all ${
+                      reportType === type.id
+                        ? 'bg-indigo-600 text-white shadow-md'
+                        : 'border border-gray-100 bg-slate-50 text-gray-500 hover:bg-indigo-50 hover:text-indigo-600'
+                    }`}
+                  >
+                    {type.label}
+                  </button>
+                ))}
               </div>
 
-              <div className="mt-5 min-h-0 flex-1 rounded-2xl border border-gray-100 bg-slate-50 p-4">
+              {reportType === 'weekly' && (
+                <ConditionBox
+                  title="최근 7일 주간 보고서"
+                  description={`${history[6]?.date || '-'} ~ ${history[0]?.date || '-'} 기록을 기준으로 분석합니다.`}
+                />
+              )}
+
+              {reportType === 'monthly' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldLabel label="월 선택">
+                    <select
+                      value={selectedMonth}
+                      onChange={(e) => {
+                        setSelectedMonth(e.target.value);
+                        setSelectedWeek('1');
+                      }}
+                      className="w-full rounded-xl border border-gray-200 bg-slate-50 px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {monthOptions.map(month => (
+                        <option key={month} value={month}>{month}</option>
+                      ))}
+                    </select>
+                  </FieldLabel>
+
+                  <FieldLabel label="주차 선택">
+                    <select
+                      value={selectedWeek}
+                      onChange={(e) => setSelectedWeek(e.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-slate-50 px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      {Object.keys(monthlyWeekGroups).map(week => (
+                        <option key={week} value={week}>{week}주차</option>
+                      ))}
+                    </select>
+                  </FieldLabel>
+                </div>
+              )}
+
+              {reportType === 'custom' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <FieldLabel label="시작일">
+                    <input
+                      type="date"
+                      value={customStartDate}
+                      onChange={(e) => setCustomStartDate(e.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-slate-50 px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </FieldLabel>
+
+                  <FieldLabel label="종료일">
+                    <input
+                      type="date"
+                      value={customEndDate}
+                      onChange={(e) => setCustomEndDate(e.target.value)}
+                      className="w-full rounded-xl border border-gray-200 bg-slate-50 px-3 py-3 text-sm font-bold outline-none focus:ring-2 focus:ring-indigo-500"
+                    />
+                  </FieldLabel>
+                </div>
+              )}
+
+              {/* 💡 껍데기(빈 div)를 지우고 버튼을 바로 배치했습니다 */}
+              <button
+                onClick={handleGenerateReport}
+                className="mt-5 w-full rounded-xl bg-slate-900 py-3 text-sm font-black text-white transition-colors hover:bg-slate-800 shadow-sm"
+              >
+                보고서 생성
+              </button>
+
+              <div className="mt-5 rounded-2xl border border-gray-100 bg-slate-50 p-4">
                 <h4 className="mb-3 text-xs font-black text-gray-500">보고서 대상 기간</h4>
                 <div className="space-y-3">
                   <SummaryLine label="시작일" value={selectedRecords[selectedRecords.length - 1]?.date || '-'} />
                   <SummaryLine label="종료일" value={selectedRecords[0]?.date || '-'} />
                   <SummaryLine label="대상 기록" value={`${selectedRecords.length}일`} />
-                  <SummaryLine label="분석 환경" value="온프레미스 AI" accent />
                 </div>
               </div>
             </Card>
@@ -344,6 +343,7 @@ function generateReport(patient, records, reportType) {
   };
 }
 
+// 공통 하위 컴포넌트 (사용되지 않는 코드 삭제)
 function FieldLabel({ label, children }) {
   return (
     <label className="block">
