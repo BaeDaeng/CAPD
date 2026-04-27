@@ -21,6 +21,7 @@ import DoctorDashboard from './pages/doctor/DoctorHome';
 import PatientInsightPage from './pages/doctor/PatientInsightPage';
 import PatientInfoPage from './pages/doctor/PatientInfoPage';
 import RecordLogsPage from './pages/doctor/RecordLogsPage';
+import AiReportPage from './pages/doctor/AiReportPage';
 
 
 function App() {
@@ -55,7 +56,7 @@ function App() {
           <Route path=":id" element={<PatientInsightPage />} />
           <Route path=":id/info" element={<PatientInfoPage />} />
           <Route path=":id/charts" element={<div>상세 차트 페이지 (예정)</div>} />
-          <Route path=":id/ai_report" element={<div>AI 리포트 페이지 (예정)</div>} />
+          <Route path=":id/ai_report" element={<AiReportPage />} />
           <Route path=":id/logs" element={<RecordLogsPage />} />
           <Route path=":id/questions" element={<div>설문 관리 페이지 (예정)</div>} />
         </Route>
