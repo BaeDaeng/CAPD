@@ -13,7 +13,7 @@ const initialMockQuestions = [
     text: '최근 3일간 발목이나 얼굴에 붓기가 느껴지셨나요?',
     options: ['예', '아니오'],
     reason: '최근 평균 제수량이 800mL 미만으로 감소 추세를 보여, 체내 수분 저류로 인한 부종 발생 여부를 확인해야 합니다.',
-    status: 'pending', 
+    status: 'pending',
   },
   {
     id: 2,
@@ -61,6 +61,22 @@ export default function QuestionManagePage() {
     );
   };
 
+  const handleGenerateQuestion = () => {
+    setQuestions(prev => [
+      {
+        id: Date.now(),
+        type: '객관식',
+        subType: '예/아니오',
+        text: 'AI가 추가로 생성한 예시 질문입니다.',
+        options: ['예', '아니오'],
+        reason: '현재는 개발용 예시 질문입니다. 추후 환자 상태 데이터를 기반으로 AI가 질문과 추천 이유를 생성하도록 연결할 예정입니다.',
+        status: 'pending',
+      },
+      ...prev,
+    ]);
+    setActiveTab('pending');
+  };
+
   const counts = {
     pending: questions.filter(q => q.status === 'pending').length,
     approved: questions.filter(q => q.status === 'approved').length,
@@ -82,14 +98,21 @@ export default function QuestionManagePage() {
               <span className="font-bold text-indigo-600">{patient.name}</span> 환자의 상태를 분석하여 AI가 추천한 질문들입니다.
             </p>
           </div>
+
+          {/* TODO: 추후 온프레미스 AI 질문 생성 API 호출로 교체 필요 */}
+          <button
+            onClick={handleGenerateQuestion}
+            className="w-full rounded-xl bg-indigo-600 px-5 py-3 text-sm font-black text-white shadow-sm transition-all hover:bg-indigo-700 active:scale-95 md:w-auto"
+          >
+            질문 생성하기
+          </button>
         </div>
       </div>
 
       <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 xl:grid-cols-12">
         {/* 좌측 사이드바: 환자 요약 및 통계 */}
         <aside className="flex min-h-0 flex-col gap-4 xl:col-span-3 overflow-y-auto custom-scrollbar pr-1">
-          
-          {/* 💡 1. 환자 요약 블럭 (요청하신 부분) */}
+          {/* 환자 요약 블럭 */}
           <Card className="border-none p-5 shadow-sm shrink-0">
             <h3 className="mb-4 text-sm font-black text-gray-800">환자 요약</h3>
             <div className="space-y-1">
@@ -101,7 +124,7 @@ export default function QuestionManagePage() {
             </div>
           </Card>
 
-          {/* 2. 설문 처리 현황 블럭 */}
+          {/* 설문 처리 현황 블럭 */}
           <Card className="border-none p-5 shadow-sm shrink-0">
             <h3 className="mb-4 text-sm font-black text-gray-800">설문 처리 현황</h3>
             <div className="flex flex-col gap-3">
@@ -124,7 +147,6 @@ export default function QuestionManagePage() {
         {/* 우측 메인: 질문 리스트 */}
         <main className="flex min-h-0 flex-col xl:col-span-9">
           <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
-            
             <div className="shrink-0 border-b border-gray-100 bg-slate-50 px-4 pt-4">
               <div className="flex gap-6">
                 <button
@@ -221,7 +243,7 @@ export default function QuestionManagePage() {
 
                       {activeTab !== 'pending' && (
                         <div className="flex items-center justify-end border-t border-gray-100 pt-4">
-                           <button
+                          <button
                             onClick={() => handleUpdateStatus(q.id, 'pending')}
                             className="text-xs font-bold text-gray-400 underline underline-offset-2 hover:text-gray-600"
                           >
@@ -241,7 +263,7 @@ export default function QuestionManagePage() {
   );
 }
 
-// 💡 보조 컴포넌트: 환자 요약 정보 행
+// 보조 컴포넌트: 환자 요약 정보 행
 function InfoRow({ label, value }) {
   return (
     <div className="flex items-center justify-between border-b border-gray-100 py-2.5 text-sm last:border-b-0 last:pb-0">
