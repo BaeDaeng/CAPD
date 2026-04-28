@@ -3,30 +3,14 @@ import { Outlet, useNavigate, Link, useParams } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 import { patientsData } from '../api/mockPatients';
 
-// TODO API 연결 시 교체:
-// - 현재 로그인한 의사의 id/name은 auth API 또는 Zustand user에서 가져오기
-// - 환자 담당 관계는 GET /doctors/{doctorId}/patients 또는 GET /patients?doctorId=... 로 조회
-// - 환자와 의사는 N:1 관계
-//   한 명의 의사는 여러 환자를 담당할 수 있지만,
-//   한 환자는 한 명의 의사에게만 담당될 수 있음
-// - 담당하지 않은 환자 id로 직접 URL 접근 시 서버에서도 권한 검증 필요
-const CURRENT_DOCTOR_ID = 'D001';
-
-const patientAssignments = {
-  P001: { doctorId: CURRENT_DOCTOR_ID, doctorName: '김의사' },
-  P002: { doctorId: CURRENT_DOCTOR_ID, doctorName: '김의사' },
-  P003: { doctorId: CURRENT_DOCTOR_ID, doctorName: '김의사' },
-  P004: { doctorId: CURRENT_DOCTOR_ID, doctorName: '김의사' },
-  P005: { doctorId: CURRENT_DOCTOR_ID, doctorName: '김의사' },
-  P006: { doctorId: CURRENT_DOCTOR_ID, doctorName: '김의사' },
-  P007: { doctorId: CURRENT_DOCTOR_ID, doctorName: '김의사' },
-  P008: { doctorId: 'D002', doctorName: '이의사' },
-  P009: { doctorId: 'D003', doctorName: '박의사' },
-  P010: null,
-};
-
 export default function DoctorLayout() {
-  const { user, logout } = useAppStore();
+  const {
+    user,
+    logout,
+    currentDoctorId,
+    patientAssignments,
+  } = useAppStore();
+
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -37,9 +21,8 @@ export default function DoctorLayout() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  // 현재 의사가 담당하는 환자만 노출합니다.
   const patients = patientsData.filter((patient) => {
-    return patientAssignments[patient.id]?.doctorId === CURRENT_DOCTOR_ID;
+    return patientAssignments[patient.id]?.doctorId === currentDoctorId;
   });
 
   const canAccessSelectedPatient = !id || patients.some((patient) => patient.id === id);
@@ -80,8 +63,6 @@ export default function DoctorLayout() {
 
   return (
     <div className="h-screen flex flex-col bg-gray-100 overflow-hidden font-sans text-slate-900">
-
-      {/* 상단 헤더 */}
       <header className="h-14 bg-slate-900 text-white px-4 flex justify-between items-center z-30 shrink-0 shadow-lg">
         <Link to="/doctor" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center font-bold text-white text-xl">✚</div>
@@ -101,10 +82,7 @@ export default function DoctorLayout() {
         </div>
       </header>
 
-      {/* 메인 바디 */}
       <div className="flex flex-1 overflow-hidden">
-
-        {/* 좌측 사이드바 */}
         <aside className="w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 z-20 shadow-sm">
           <div className="p-3 border-b space-y-3 bg-slate-50">
             <div className="flex bg-gray-200 p-1 rounded-lg">
@@ -122,7 +100,6 @@ export default function DoctorLayout() {
               </button>
             </div>
 
-            {/* 환자 조회 검색창 */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -182,7 +159,6 @@ export default function DoctorLayout() {
           </div>
         </aside>
 
-        {/* 중앙: 메인 화면 */}
         <main className="flex-1 overflow-y-auto bg-slate-50 relative">
           {canAccessSelectedPatient ? (
             <Outlet />
@@ -191,7 +167,6 @@ export default function DoctorLayout() {
           )}
         </main>
 
-        {/* 우측: 캘린더/예약 사이드바 */}
         <aside className="w-80 bg-white border-l border-gray-200 flex flex-col shrink-0 z-10">
           <div className="p-4 border-b">
             <div className="flex justify-between items-center mb-4">
@@ -258,7 +233,6 @@ export default function DoctorLayout() {
             </div>
           </div>
 
-          {/* 다음 진료 환자 알림 */}
           {nextPatient && (
             <div className="p-4 bg-slate-900 text-white rounded-t-3xl shadow-2xl relative z-20">
               <div className="text-[10px] font-bold text-blue-400 mb-1 uppercase tracking-widest">Upcoming Next</div>

@@ -3,40 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import Card from '../../components/Card';
 import { patientsData } from '../../api/mockPatients';
 import Sparkline from '../../components/Sparkline';
-
-const CURRENT_DOCTOR_ID = 'D001';
-const CURRENT_DOCTOR_NAME = '김의사';
-
-// TODO API 연결 시 교체:
-// - 현재 로그인한 의사의 id/name은 auth API 또는 Zustand user에서 가져오기
-// - 환자 담당 관계는 GET /doctors/{doctorId}/patients 로 조회
-// - 환자 추가는 POST /doctors/{doctorId}/patients/{patientId}
-// - 이미 다른 의사가 담당 중인 환자는 API 응답에서 assignedDoctorId가 존재하고,
-//   assignedDoctorId !== CURRENT_DOCTOR_ID 인 경우 추가 버튼을 비활성화
-// - 환자와 의사는 N:1 관계: 한 명의 의사는 여러 환자를 담당할 수 있지만,
-//   한 환자는 한 명의 의사에게만 담당될 수 있음
-const initialPatientAssignments = {
-  P001: { doctorId: CURRENT_DOCTOR_ID, doctorName: CURRENT_DOCTOR_NAME },
-  P002: { doctorId: CURRENT_DOCTOR_ID, doctorName: CURRENT_DOCTOR_NAME },
-  P003: { doctorId: CURRENT_DOCTOR_ID, doctorName: CURRENT_DOCTOR_NAME },
-  P004: { doctorId: CURRENT_DOCTOR_ID, doctorName: CURRENT_DOCTOR_NAME },
-  P005: { doctorId: CURRENT_DOCTOR_ID, doctorName: CURRENT_DOCTOR_NAME },
-  P006: { doctorId: CURRENT_DOCTOR_ID, doctorName: CURRENT_DOCTOR_NAME },
-  P007: { doctorId: CURRENT_DOCTOR_ID, doctorName: CURRENT_DOCTOR_NAME },
-  P008: { doctorId: 'D002', doctorName: '이의사' },
-  P009: { doctorId: 'D003', doctorName: '박의사' },
-  P010: null,
-};
+import useAppStore from '../../store/useAppStore';
 
 export default function DoctorHome() {
   const navigate = useNavigate();
+
+  const {
+    currentDoctorId,
+    currentDoctorName,
+    patientAssignments,
+    assignPatientToCurrentDoctor,
+  } = useAppStore();
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [assignments, setAssignments] = useState(initialPatientAssignments);
   const [searchQuery, setSearchQuery] = useState('');
 
   const assignedPatients = useMemo(() => {
-    return patientsData.filter(patient => assignments[patient.id]?.doctorId === CURRENT_DOCTOR_ID);
-  }, [assignments]);
+    return patientsData.filter(patient => patientAssignments[patient.id]?.doctorId === currentDoctorId);
+  }, [currentDoctorId, patientAssignments]);
 
   const patientList = assignedPatients.map(p => {
     const todayData = p.history && p.history.length > 0 ? p.history[0] : {};
@@ -85,16 +69,6 @@ export default function DoctorHome() {
     );
   });
 
-  const handleAddPatient = (patientId) => {
-    setAssignments(prev => ({
-      ...prev,
-      [patientId]: {
-        doctorId: CURRENT_DOCTOR_ID,
-        doctorName: CURRENT_DOCTOR_NAME,
-      },
-    }));
-  };
-
   return (
     <div className="h-full flex flex-col p-6 animate-in fade-in duration-500 bg-slate-100">
       <div className="bg-white px-5 py-3 rounded-xl shadow-sm border border-gray-200 flex flex-col gap-4 shrink-0 mb-4 lg:flex-row lg:items-center lg:justify-between">
@@ -103,7 +77,7 @@ export default function DoctorHome() {
             전체 환자 모니터링
           </h1>
           <p className="text-xs font-bold text-slate-400 mt-1">
-            {CURRENT_DOCTOR_NAME} 선생님의 담당 환자만 표시됩니다.
+            {currentDoctorName} 선생님의 담당 환자만 표시됩니다.
           </p>
         </div>
 
@@ -174,7 +148,7 @@ export default function DoctorHome() {
                       {[...Array(5)].map((_, i) => (
                         <div key={i} className="shrink-0">
                           {i < patient.record ? (
-                            <svg className="w-4.5 h-4.5 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="h-4 w-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
                               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                             </svg>
                           ) : (
@@ -228,10 +202,11 @@ export default function DoctorHome() {
       {isAddModalOpen && (
         <AddPatientModal
           patients={modalPatients}
-          assignments={assignments}
+          assignments={patientAssignments}
+          currentDoctorId={currentDoctorId}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          onAdd={handleAddPatient}
+          onAdd={assignPatientToCurrentDoctor}
           onClose={() => setIsAddModalOpen(false)}
         />
       )}
@@ -239,7 +214,7 @@ export default function DoctorHome() {
   );
 }
 
-function AddPatientModal({ patients, assignments, searchQuery, setSearchQuery, onAdd, onClose }) {
+function AddPatientModal({ patients, assignments, currentDoctorId, searchQuery, setSearchQuery, onAdd, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm">
       <div className="flex max-h-[86vh] w-full max-w-3xl flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
@@ -273,8 +248,8 @@ function AddPatientModal({ patients, assignments, searchQuery, setSearchQuery, o
           <div className="space-y-2">
             {patients.map(patient => {
               const assignment = assignments[patient.id];
-              const isMine = assignment?.doctorId === CURRENT_DOCTOR_ID;
-              const isOtherDoctor = assignment && assignment.doctorId !== CURRENT_DOCTOR_ID;
+              const isMine = assignment?.doctorId === currentDoctorId;
+              const isOtherDoctor = assignment && assignment.doctorId !== currentDoctorId;
               const canAdd = !assignment;
 
               return (
@@ -289,9 +264,7 @@ function AddPatientModal({ patients, assignments, searchQuery, setSearchQuery, o
                       <span className="text-xs font-bold text-slate-400">{patient.sex}/{patient.age}세</span>
                     </div>
                     <div className="mt-1 text-xs font-medium text-slate-500">
-                      {assignment
-                        ? `담당의: ${assignment.doctorName}`
-                        : '담당의 없음'}
+                      {assignment ? `담당의: ${assignment.doctorName}` : '담당의 없음'}
                     </div>
                   </div>
 
