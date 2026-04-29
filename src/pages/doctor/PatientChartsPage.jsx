@@ -93,7 +93,7 @@ export default function PatientChartsPage() {
                     <div className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-right shadow-sm">
                         <div className="text-[10px] font-black uppercase tracking-widest text-slate-400">Patient</div>
                         <div className="text-sm font-black text-slate-900">
-                            {patient.id} · {patient.sex}/{patient.age}세
+                            {patient.sex}/{patient.age}세
                         </div>
                     </div>
                 </div>
