@@ -5,6 +5,10 @@ import { patientsData } from '../../api/mockPatients';
 import Sparkline from '../../components/Sparkline';
 import useAppStore from '../../store/useAppStore';
 
+function getPatientPhone(patient) {
+  return patient.phone || patient.phoneNumber || patient.tel || patient.mobile || '-';
+}
+
 export default function DoctorHome() {
   const navigate = useNavigate();
 
@@ -62,10 +66,13 @@ export default function DoctorHome() {
     const query = searchQuery.trim().toLowerCase();
     if (!query) return true;
 
+    const phone = getPatientPhone(patient).toLowerCase();
+    const normalizedPhone = phone.replace(/-/g, '');
+    const normalizedQuery = query.replace(/-/g, '');
+
     return (
-      patient.name.toLowerCase().includes(query) ||
-      patient.id.toLowerCase().includes(query) ||
-      String(patient.age).includes(query)
+      phone.includes(query) ||
+      normalizedPhone.includes(normalizedQuery)
     );
   });
 
@@ -223,7 +230,7 @@ function AddPatientModal({ patients, assignments, currentDoctorId, searchQuery, 
             <div>
               <h2 className="text-xl font-black text-slate-900">담당환자 추가</h2>
               <p className="mt-1 text-sm font-medium text-slate-500">
-                담당의가 없는 환자만 추가할 수 있습니다.
+                환자 전화번호로 검색한 뒤, 담당의가 없는 환자만 추가할 수 있습니다.
               </p>
             </div>
             <button
@@ -239,7 +246,7 @@ function AddPatientModal({ patients, assignments, currentDoctorId, searchQuery, 
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="환자 이름, 번호, 나이 검색"
+            placeholder="환자 전화번호 검색"
             className="mt-4 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-bold outline-none transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />
         </div>
@@ -251,6 +258,7 @@ function AddPatientModal({ patients, assignments, currentDoctorId, searchQuery, 
               const isMine = assignment?.doctorId === currentDoctorId;
               const isOtherDoctor = assignment && assignment.doctorId !== currentDoctorId;
               const canAdd = !assignment;
+              const phone = getPatientPhone(patient);
 
               return (
                 <div
@@ -262,6 +270,9 @@ function AddPatientModal({ patients, assignments, currentDoctorId, searchQuery, 
                       <span className="text-sm font-black text-slate-900">{patient.name}</span>
                       <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-bold text-slate-500">{patient.id}</span>
                       <span className="text-xs font-bold text-slate-400">{patient.sex}/{patient.age}세</span>
+                    </div>
+                    <div className="mt-1 text-xs font-bold text-slate-500">
+                      전화번호: <span className="font-mono text-slate-700">{phone}</span>
                     </div>
                     <div className="mt-1 text-xs font-medium text-slate-500">
                       {assignment ? `담당의: ${assignment.doctorName}` : '담당의 없음'}
@@ -287,6 +298,12 @@ function AddPatientModal({ patients, assignments, currentDoctorId, searchQuery, 
                 </div>
               );
             })}
+
+            {patients.length === 0 && (
+              <div className="flex min-h-40 items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-sm font-bold text-slate-400">
+                일치하는 전화번호의 환자가 없습니다.
+              </div>
+            )}
           </div>
         </div>
 
