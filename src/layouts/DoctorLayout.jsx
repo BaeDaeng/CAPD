@@ -207,6 +207,16 @@ export default function DoctorLayout() {
             </div>
           </div>
 
+          <div className="p-4 border-b bg-white">
+            <button
+              type="button"
+              onClick={() => navigate('/doctor/appointments/new')}
+              className="w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-black text-white shadow-sm transition-all hover:bg-blue-700 active:scale-[0.99]"
+            >
+              + 환자 예약 등록
+            </button>
+          </div>
+          
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="px-4 py-3 bg-slate-50 border-b flex justify-between items-center">
               <span className="text-xs font-bold text-gray-600">{selectedDate.getMonth() + 1}월 {selectedDate.getDate()}일 예약 현황</span>

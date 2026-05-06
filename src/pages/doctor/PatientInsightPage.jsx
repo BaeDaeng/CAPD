@@ -330,7 +330,7 @@ export default function PatientInsightPage() {
                     <td className="px-3 py-2 text-gray-500 font-mono">{ex.drained}</td>
                     <td className="px-3 py-2 font-bold text-blue-600 font-mono">+{ex.uf}</td>
                   </tr>
-                ))}3
+                ))}
               </tbody>
             </table>
           </div>

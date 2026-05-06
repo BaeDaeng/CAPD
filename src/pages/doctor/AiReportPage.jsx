@@ -86,6 +86,29 @@ export default function AiReportPage() {
     setReportData(generateReport(patient, selectedRecords, reportType));
   };
 
+  const handleCopyReport = async () => {
+    if (!reportData) return;
+
+    const reportText = [
+      `[${reportData.title}]`,
+      `기간: ${reportData.period}`,
+      `위험도: ${reportData.riskLevel}`,
+      '',
+      `요약: ${reportData.summary}`,
+      '',
+      '주요 수치',
+      ...reportData.vitals.map(item => `- ${item.label}: ${item.value}`),
+      '',
+      'AI 정밀 데이터 분석',
+      ...reportData.analysis.map((text, index) => `${index + 1}. ${text}`),
+      '',
+      `권고사항: ${reportData.recommendation}`,
+    ].join('\n');
+
+    await navigator.clipboard.writeText(reportText);
+    alert('보고서가 복사되었습니다.');
+  };
+
   return (
     <div className="h-full overflow-hidden bg-slate-50 p-4 md:p-6 animate-in fade-in duration-500">
       <div className="flex h-full min-h-0 flex-col">
@@ -111,7 +134,6 @@ export default function AiReportPage() {
         </div>
 
         <div className="grid min-h-0 flex-1 grid-cols-1 gap-4 xl:grid-cols-12">
-          {/* 💡 aside 영역: 스크롤 추가 및 내부 카드를 내용에 맞게 줄임(h-fit) */}
           <aside className="min-h-0 xl:col-span-4 overflow-y-auto custom-scrollbar pr-1">
             <Card className="flex h-fit flex-col border-none p-5 shadow-sm">
               <h3 className="mb-4 text-sm font-black text-gray-800">보고서 조건</h3>
@@ -192,7 +214,6 @@ export default function AiReportPage() {
                 </div>
               )}
 
-              {/* 💡 껍데기(빈 div)를 지우고 버튼을 바로 배치했습니다 */}
               <button
                 onClick={handleGenerateReport}
                 className="mt-5 w-full rounded-xl bg-slate-900 py-3 text-sm font-black text-white transition-colors hover:bg-slate-800 shadow-sm"
@@ -228,15 +249,25 @@ export default function AiReportPage() {
                         <p className="mt-1 font-mono text-xs text-gray-400">{reportData.period}</p>
                       </div>
 
-                      <span className={`rounded-full px-3 py-1 text-xs font-black ${
-                        reportData.riskLevel === '위험'
-                          ? 'bg-rose-100 text-rose-700'
-                          : reportData.riskLevel === '주의'
-                            ? 'bg-yellow-100 text-yellow-700'
-                            : 'bg-emerald-100 text-emerald-700'
-                      }`}>
-                        {reportData.riskLevel}
-                      </span>
+                      <div className="flex shrink-0 items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleCopyReport}
+                          className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-black text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-800"
+                        >
+                          보고서 복사하기
+                        </button>
+
+                        <span className={`rounded-full px-3 py-1 text-xs font-black ${
+                          reportData.riskLevel === '위험'
+                            ? 'bg-rose-100 text-rose-700'
+                            : reportData.riskLevel === '주의'
+                              ? 'bg-yellow-100 text-yellow-700'
+                              : 'bg-emerald-100 text-emerald-700'
+                        }`}>
+                          {reportData.riskLevel}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -343,7 +374,6 @@ function generateReport(patient, records, reportType) {
   };
 }
 
-// 공통 하위 컴포넌트 (사용되지 않는 코드 삭제)
 function FieldLabel({ label, children }) {
   return (
     <label className="block">

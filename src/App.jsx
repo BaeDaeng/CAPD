@@ -24,6 +24,7 @@ import RecordLogsPage from './pages/doctor/RecordLogsPage';
 import AiReportPage from './pages/doctor/AiReportPage';
 import QuestionManagePage from './pages/doctor/QuestionManagePage';
 import PatientChartsPage from './pages/doctor/PatientChartsPage';
+import AppointmentCreatePage from './pages/doctor/AppointmentCreatePage';
 
 
 function App() {
@@ -61,6 +62,7 @@ function App() {
           <Route path=":id/ai_report" element={<AiReportPage />} />
           <Route path=":id/logs" element={<RecordLogsPage />} />
           <Route path=":id/questions" element={<QuestionManagePage />} />
+          <Route path="appointments/new" element={<AppointmentCreatePage />} />
         </Route>
 
         {/* 리다이렉트 설정 */}
