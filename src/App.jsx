@@ -16,6 +16,7 @@ import PatientRecordList from './pages/patient/RecordListPage';
 import PatientSurvey from './pages/patient/HealthSurveyPage';
 import PatientChat from './pages/patient/SymptomHelperPage';
 import PatientSchedule from './pages/patient/VisitSchedulePage';
+import PatientMyPage from './pages/patient/PatientMyPage';
 
 import DoctorDashboard from './pages/doctor/DoctorHome';
 import PatientInsightPage from './pages/doctor/PatientInsightPage';
@@ -27,6 +28,7 @@ import QuestionCheckPage from './pages/doctor/QuestionCheckPage';
 import PatientChartsPage from './pages/doctor/PatientChartsPage';
 import AppointmentCreatePage from './pages/doctor/AppointmentCreatePage';
 import AppointmentCheckPage from './pages/doctor/AppointmentCheckPage';
+import DoctorMyPage from './pages/doctor/DoctorMyPage';
 
 
 function App() {
@@ -52,6 +54,7 @@ function App() {
           <Route path="survey" element={<PatientSurvey />} />
           <Route path="chat" element={<PatientChat />} />
           <Route path="schedule" element={<PatientSchedule />} />
+          <Route path="mypage" element={<PatientMyPage />} />
         </Route>
 
         {/* 의사 전용 경로 (DoctorLayout 적용) */}
@@ -67,6 +70,7 @@ function App() {
           <Route path=":id/questions_list" element={<QuestionCheckPage />} />
           <Route path="appointments/new" element={<AppointmentCreatePage />} />
           <Route path="appointments/check" element={<AppointmentCheckPage />} />
+          <Route path="mypage" element={<DoctorMyPage />} />
         </Route>
 
         {/* 리다이렉트 설정 */}

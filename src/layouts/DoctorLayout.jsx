@@ -76,6 +76,15 @@ export default function DoctorLayout() {
             <span className="text-sm font-medium text-slate-200">{user?.name || '담당의'} 선생님</span>
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
           </div>
+
+          <button
+            type="button"
+            onClick={() => navigate('/doctor/mypage')}
+            className="hidden sm:flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-bold text-slate-200 transition-all hover:border-blue-500 hover:bg-blue-500/10 hover:text-white active:scale-95"
+          >
+            내정보
+          </button>
+
           <button onClick={handleLogout} className="text-xs text-slate-400 hover:text-white border border-slate-700 px-3 py-1 rounded-md transition-all">
             로그아웃
           </button>
@@ -178,7 +187,7 @@ export default function DoctorLayout() {
             </div>
 
             <div className="grid grid-cols-7 gap-1 text-center">
-              {['일','월','화','수','목','금','토'].map(d => (
+              {['일', '월', '화', '수', '목', '금', '토'].map(d => (
                 <span key={d} className="text-[10px] font-bold text-gray-400 mb-2">{d}</span>
               ))}
               {Array.from({ length: firstDayOfMonth }).map((_, i) => (
@@ -193,9 +202,8 @@ export default function DoctorLayout() {
                   <div
                     key={day}
                     onClick={() => setSelectedDate(new Date(year, month, day))}
-                    className={`h-8 flex flex-col items-center justify-center text-[11px] rounded-md cursor-pointer hover:bg-blue-50 transition-colors ${
-                      isSelected ? 'bg-blue-600 text-white font-bold shadow-md hover:bg-blue-700' : 'text-gray-700'
-                    }`}
+                    className={`h-8 flex flex-col items-center justify-center text-[11px] rounded-md cursor-pointer hover:bg-blue-50 transition-colors ${isSelected ? 'bg-blue-600 text-white font-bold shadow-md hover:bg-blue-700' : 'text-gray-700'
+                      }`}
                   >
                     {day}
                     {hasAppointment && (
@@ -226,7 +234,7 @@ export default function DoctorLayout() {
               </button>
             </div>
           </div>
-          
+
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="px-4 py-3 bg-slate-50 border-b flex justify-between items-center">
               <span className="text-xs font-bold text-gray-600">{selectedDate.getMonth() + 1}월 {selectedDate.getDate()}일 예약 현황</span>
