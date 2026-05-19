@@ -2,6 +2,7 @@
 import { Outlet, useNavigate, Link, useParams } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 import { patientsData } from '../api/mockPatients';
+import DoctorChatPage from '../pages/doctor/DoctorChatPage';
 
 export default function DoctorLayout() {
   const {
@@ -14,35 +15,54 @@ export default function DoctorLayout() {
   const navigate = useNavigate();
   const { id } = useParams();
 
+  // 좌측 환자 목록 탭 상태 관리
   const [patientTab, setPatientTab] = useState('today');
+
+  // 좌측 환자 목록 정렬 상태 관리
   const [sortBy, setSortBy] = useState('name');
+
+  // 좌측 환자 검색어 상태 관리
   const [searchQuery, setSearchQuery] = useState('');
 
+  // 우측 캘린더 현재 월 상태 관리
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  // 우측 캘린더 선택 날짜 상태 관리
   const [selectedDate, setSelectedDate] = useState(new Date());
 
+  // 현재 로그인한 의사의 담당 환자 목록 계산
   const patients = patientsData.filter((patient) => {
     return patientAssignments[patient.id]?.doctorId === currentDoctorId;
   });
 
+  // 현재 URL에서 선택된 환자 객체 계산
+  const selectedPatient = patients.find(patient => patient.id === id);
+
+  // 선택된 환자가 담당 환자인지 확인하는 접근 제어 기능
   const canAccessSelectedPatient = !id || patients.some((patient) => patient.id === id);
 
+  // 우측 예약 현황에 사용할 환자 목록 정렬
   const scheduledPatients = [...patients].sort((a, b) => a.time.localeCompare(b.time));
-  const nextPatient = scheduledPatients.find(p => p.status === 'waiting') || scheduledPatients[0];
 
+  // 캘린더 날짜 계산
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDayOfMonth = new Date(year, month, 1).getDay();
 
+  // 이전 달 이동 기능
   const handlePrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+
+  // 다음 달 이동 기능
   const handleNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
+  // 로그아웃 기능
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
+  // 환자 검색 및 정렬 결과 계산
   let displayedPatients = patients;
 
   if (searchQuery.trim()) {
@@ -63,6 +83,7 @@ export default function DoctorLayout() {
 
   return (
     <div className="h-screen flex flex-col bg-gray-100 overflow-hidden font-sans text-slate-900">
+      {/* 상단 레이아웃: EMR 로고, 로그인 의사 정보, 내정보, 로그아웃 */}
       <header className="h-14 bg-slate-900 text-white px-4 flex justify-between items-center z-30 shrink-0 shadow-lg">
         <Link to="/doctor" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center font-bold text-white text-xl">✚</div>
@@ -82,6 +103,7 @@ export default function DoctorLayout() {
             onClick={() => navigate('/doctor/mypage')}
             className="hidden sm:flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-800 px-3 py-1 text-xs font-bold text-slate-200 transition-all hover:border-blue-500 hover:bg-blue-500/10 hover:text-white active:scale-95"
           >
+            <span className="text-[11px]">👤</span>
             내정보
           </button>
 
@@ -92,8 +114,10 @@ export default function DoctorLayout() {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
+        {/* 좌측 레이아웃: 담당 환자 탭, 검색, 정렬, 환자 목록 */}
         <aside className="w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 z-20 shadow-sm">
           <div className="p-3 border-b space-y-3 bg-slate-50">
+            {/* 담당 환자 목록 탭 */}
             <div className="flex bg-gray-200 p-1 rounded-lg">
               <button
                 onClick={() => setPatientTab('today')}
@@ -109,6 +133,7 @@ export default function DoctorLayout() {
               </button>
             </div>
 
+            {/* 환자 검색 입력 영역 */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,6 +149,7 @@ export default function DoctorLayout() {
               />
             </div>
 
+            {/* 환자 목록 정렬 영역 */}
             <div className="flex justify-between items-center px-1">
               <span className="text-[11px] font-bold text-gray-400">MY PATIENT LIST</span>
               <select
@@ -137,6 +163,7 @@ export default function DoctorLayout() {
             </div>
           </div>
 
+          {/* 환자 목록 영역 */}
           <div className="flex-1 overflow-y-auto p-2 space-y-1">
             {displayedPatients.length > 0 ? (
               displayedPatients.map((p) => (
@@ -168,6 +195,7 @@ export default function DoctorLayout() {
           </div>
         </aside>
 
+        {/* 중앙 콘텐츠 레이아웃: 선택 환자 상세 페이지 또는 접근 제한 화면 */}
         <main className="flex-1 overflow-y-auto bg-slate-50 relative">
           {canAccessSelectedPatient ? (
             <Outlet />
@@ -176,7 +204,9 @@ export default function DoctorLayout() {
           )}
         </main>
 
+        {/* 우측 레이아웃: 캘린더, 예약 버튼, 예약 현황, AI 진료 도우미 */}
         <aside className="w-80 bg-white border-l border-gray-200 flex flex-col shrink-0 z-10">
+          {/* 우측 캘린더 영역 */}
           <div className="p-4 border-b">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-sm text-gray-700">{year}년 {month + 1}월</h3>
@@ -187,7 +217,7 @@ export default function DoctorLayout() {
             </div>
 
             <div className="grid grid-cols-7 gap-1 text-center">
-              {['일', '월', '화', '수', '목', '금', '토'].map(d => (
+              {['일','월','화','수','목','금','토'].map(d => (
                 <span key={d} className="text-[10px] font-bold text-gray-400 mb-2">{d}</span>
               ))}
               {Array.from({ length: firstDayOfMonth }).map((_, i) => (
@@ -202,8 +232,9 @@ export default function DoctorLayout() {
                   <div
                     key={day}
                     onClick={() => setSelectedDate(new Date(year, month, day))}
-                    className={`h-8 flex flex-col items-center justify-center text-[11px] rounded-md cursor-pointer hover:bg-blue-50 transition-colors ${isSelected ? 'bg-blue-600 text-white font-bold shadow-md hover:bg-blue-700' : 'text-gray-700'
-                      }`}
+                    className={`h-8 flex flex-col items-center justify-center text-[11px] rounded-md cursor-pointer hover:bg-blue-50 transition-colors ${
+                      isSelected ? 'bg-blue-600 text-white font-bold shadow-md hover:bg-blue-700' : 'text-gray-700'
+                    }`}
                   >
                     {day}
                     {hasAppointment && (
@@ -215,6 +246,7 @@ export default function DoctorLayout() {
             </div>
           </div>
 
+          {/* 예약 등록/목록 이동 버튼 영역 */}
           <div className="p-4 border-b bg-white">
             <div className="grid grid-cols-2 gap-2">
               <button
@@ -235,6 +267,7 @@ export default function DoctorLayout() {
             </div>
           </div>
 
+          {/* 선택 날짜 예약 현황 영역 */}
           <div className="flex-1 flex flex-col overflow-hidden">
             <div className="px-4 py-3 bg-slate-50 border-b flex justify-between items-center">
               <span className="text-xs font-bold text-gray-600">{selectedDate.getMonth() + 1}월 {selectedDate.getDate()}일 예약 현황</span>
@@ -261,23 +294,8 @@ export default function DoctorLayout() {
             </div>
           </div>
 
-          {nextPatient && (
-            <div className="p-4 bg-slate-900 text-white rounded-t-3xl shadow-2xl relative z-20">
-              <div className="text-[10px] font-bold text-blue-400 mb-1 uppercase tracking-widest">Upcoming Next</div>
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="text-lg font-black">{nextPatient.time} <span className="text-sm font-normal text-slate-400">{nextPatient.name} 환자</span></div>
-                  <div className="text-xs text-slate-400 mt-1">대기실에서 준비 중입니다.</div>
-                </div>
-                <button
-                  onClick={() => navigate(`/doctor/${nextPatient.id}`)}
-                  className="bg-blue-600 p-3 rounded-full hover:bg-blue-500 transition-colors shadow-lg hover:scale-105 active:scale-95 flex items-center justify-center"
-                >
-                  ▶
-                </button>
-              </div>
-            </div>
-          )}
+          {/* 우측 하단 AI 진료 도우미 영역 */}
+          <DoctorChatPage currentPatient={selectedPatient} />
         </aside>
       </div>
     </div>
