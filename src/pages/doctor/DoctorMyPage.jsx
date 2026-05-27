@@ -1,40 +1,32 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAppStore from '../../store/useAppStore';
-import { patientsData } from '../../api/mockPatients';
-
-// TODO: 의사 상세 정보 조회 API 연결 후 응답 데이터로 교체
-const mockDoctorProfile = {
-  doctorId: 'D001',
-  name: '김의사',
-  email: 'doctor@example.com',
-  phone: '010-2468-1357',
-  department: '신장내과',
-  licenseNo: 'MD-2026-001',
-  position: '전문의',
-};
+import { useDoctorMe, useDoctorPatientProfiles, useDoctorPatients } from '../../hooks/usePatientData';
 
 export default function DoctorMyPage() {
   const navigate = useNavigate();
-
-  const {
-    user,
-    currentDoctorId,
-    patientAssignments,
-  } = useAppStore();
-
-  // 담당 환자 목록 계산 기능
-  const assignedPatients = patientsData.filter(patient => (
-    patientAssignments[patient.id]?.doctorId === currentDoctorId
-  ));
-
-  // 로그인 사용자명 우선 표시 기능
-  const displayName = user?.name || mockDoctorProfile.name;
+  const { user } = useAppStore();
+  const { data: doctor } = useDoctorMe();
+  const { data: assignedPatients = [] } = useDoctorPatients();
+  const visibleAssignedPatients = useMemo(() => assignedPatients.slice(0, 9), [assignedPatients]);
+  const visiblePatientIds = useMemo(() => (
+    visibleAssignedPatients.map(patient => patient.id).filter(Boolean)
+  ), [visibleAssignedPatients]);
+  const { data: patientProfiles = [], isLoading: isPatientProfilesLoading } = useDoctorPatientProfiles(visiblePatientIds);
+  const patientProfileMap = useMemo(() => (
+    new Map(patientProfiles.map(patient => [String(patient.id), patient]))
+  ), [patientProfiles]);
+  const enrichedAssignedPatients = useMemo(() => (
+    visibleAssignedPatients.map((patient) => mergePatientProfile(
+      patient,
+      patientProfileMap.get(String(patient.id)),
+    ))
+  ), [patientProfileMap, visibleAssignedPatients]);
+  const displayName = doctor?.name || user?.name || '담당의';
 
   return (
     <div className="h-full overflow-hidden bg-slate-50 p-4 md:p-6 animate-in fade-in duration-500">
       <div className="grid h-full min-h-0 grid-cols-12 gap-4">
-        {/* 좌측 의사 프로필 영역 */}
         <section className="col-span-12 flex min-h-0 flex-col overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 text-white shadow-sm xl:col-span-4">
           <div className="relative p-6">
             <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-blue-500/20 blur-3xl"></div>
@@ -56,33 +48,30 @@ export default function DoctorMyPage() {
             </div>
           </div>
 
-          {/* 담당 환자 수 요약 영역 */}
           <div className="px-5">
             <DarkStat label="담당 환자" value={`${assignedPatients.length}명`} />
           </div>
 
-          {/* 의사 계정 상세 정보 영역 */}
           <div className="mt-5 min-h-0 flex-1 px-5 pb-5">
             <div className="grid h-full grid-rows-[auto_1fr] gap-4 rounded-2xl border border-white/10 bg-white/5 p-4">
               <div>
                 <div className="mb-3 text-xs font-black text-slate-400">기본 정보</div>
                 <div className="space-y-3">
-                  <ProfileLine label="의사번호" value={mockDoctorProfile.doctorId} dark />
-                  <ProfileLine label="진료과" value={mockDoctorProfile.department} dark />
-                  <ProfileLine label="직책" value={mockDoctorProfile.position} dark />
-                  <ProfileLine label="면허번호" value={mockDoctorProfile.licenseNo} dark />
+                  <ProfileLine label="의사번호" value={doctor?.doctorId || '-'} dark />
+                  <ProfileLine label="사용자번호" value={doctor?.userId || '-'} dark />
+                  <ProfileLine label="권한" value={doctor?.role || 'DOCTOR'} dark />
+                  <ProfileLine label="가입일" value={doctor?.createdAt ? doctor.createdAt.slice(0, 10) : '-'} dark />
                 </div>
               </div>
 
               <div className="grid content-end gap-3">
-                <ContactBox label="이메일" value={mockDoctorProfile.email} />
-                <ContactBox label="전화번호" value={mockDoctorProfile.phone} />
+                <ContactBox label="이메일" value={doctor?.email || '-'} />
+                <ContactBox label="전화번호" value={doctor?.phone || '-'} />
               </div>
             </div>
           </div>
         </section>
 
-        {/* 우측 담당 환자 목록 영역 */}
         <main className="col-span-12 min-h-0 rounded-3xl border border-slate-100 bg-white p-5 shadow-sm xl:col-span-8">
           <div className="mb-4 flex items-center justify-between gap-4">
             <div>
@@ -109,9 +98,14 @@ export default function DoctorMyPage() {
           </div>
 
           <div className="grid h-[calc(100%-76px)] min-h-0 grid-cols-1 gap-3 overflow-hidden md:grid-cols-2 xl:grid-cols-3">
-            {assignedPatients.slice(0, 9).map(patient => (
-              <PatientMiniCard key={patient.id} patient={patient} />
+            {enrichedAssignedPatients.map(patient => (
+              <PatientMiniCard key={patient.id} patient={patient} isLoadingDetails={isPatientProfilesLoading} />
             ))}
+            {assignedPatients.length === 0 && (
+              <div className="col-span-full flex items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-sm font-bold text-slate-400">
+                담당 환자가 없습니다.
+              </div>
+            )}
           </div>
         </main>
       </div>
@@ -119,7 +113,25 @@ export default function DoctorMyPage() {
   );
 }
 
-// 어두운 프로필 카드 안의 핵심 수치를 표시하는 기능
+function mergePatientProfile(patient, profile) {
+  if (!profile) return patient;
+
+  return {
+    ...patient,
+    ...profile,
+    email: preferProfileValue(profile.email, patient.email),
+    phone: preferProfileValue(profile.phone, patient.phone),
+  };
+}
+
+function preferProfileValue(profileValue, fallbackValue) {
+  if (profileValue === undefined || profileValue === null || profileValue === '' || profileValue === '-') {
+    return fallbackValue || '-';
+  }
+
+  return profileValue;
+}
+
 function DarkStat({ label, value }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-white/10 px-4 py-4 text-center">
@@ -129,7 +141,6 @@ function DarkStat({ label, value }) {
   );
 }
 
-// 프로필 라벨과 값을 한 줄로 표시하는 기능
 function ProfileLine({ label, value, dark = false }) {
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
@@ -139,7 +150,6 @@ function ProfileLine({ label, value, dark = false }) {
   );
 }
 
-// 연락 정보를 어두운 프로필 카드 안에서 표시하는 기능
 function ContactBox({ label, value }) {
   return (
     <div className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3">
@@ -149,10 +159,7 @@ function ContactBox({ label, value }) {
   );
 }
 
-// 담당 환자 미니 카드를 표시하는 기능
-function PatientMiniCard({ patient }) {
-  const isWaiting = patient.status === 'waiting';
-
+function PatientMiniCard({ patient, isLoadingDetails }) {
   return (
     <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
       <div className="flex items-start justify-between gap-3">
@@ -163,29 +170,26 @@ function PatientMiniCard({ patient }) {
           </div>
         </div>
 
-        <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black ${
-          isWaiting
-            ? 'bg-orange-100 text-orange-700'
-            : 'bg-slate-200 text-slate-500'
-        }`}>
-          {isWaiting ? '대기' : '완료'}
+        <span className="shrink-0 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-black text-blue-700">
+          담당
         </span>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <PatientMetric label="예약" value={patient.time} />
-        <PatientMetric label="최근 기록" value={patient.lastDialysis} />
+        <PatientMetric label="전화번호" value={patient.phone} isLoading={isLoadingDetails} />
+        <PatientMetric label="이메일" value={patient.email} isLoading={isLoadingDetails} />
       </div>
     </div>
   );
 }
 
-// 환자 카드 안의 작은 지표를 표시하는 기능
-function PatientMetric({ label, value }) {
+function PatientMetric({ label, value, isLoading }) {
+  const displayValue = isLoading && (!value || value === '-') ? '조회 중' : value;
+
   return (
     <div className="rounded-xl bg-white px-3 py-2">
       <div className="text-[10px] font-black text-slate-400">{label}</div>
-      <div className="mt-0.5 truncate text-xs font-black text-slate-700">{value}</div>
+      <div className="mt-0.5 truncate text-xs font-black text-slate-700">{displayValue || '-'}</div>
     </div>
   );
 }

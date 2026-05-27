@@ -1,12 +1,18 @@
 import React from 'react';
 import { Outlet, useNavigate, NavLink, Link } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
+import { authApi } from '../api/apiClient';
 
 export default function PatientLayout() {
   const { user, logout } = useAppStore();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await authApi.logoutPatient();
+    } catch {
+      // 서버 세션 종료에 실패해도 클라이언트 세션은 정리합니다.
+    }
     logout();
     navigate('/login');
   };

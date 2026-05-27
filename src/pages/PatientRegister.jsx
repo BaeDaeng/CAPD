@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { patientApi } from '../api/apiClient';
+import { toApiSex } from '../api/adapters';
 
 export default function PatientRegister() {
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ export default function PatientRegister() {
   const [emailVerified, setEmailVerified] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
   const [isCheckingCode, setIsCheckingCode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,14 +46,10 @@ export default function PatientRegister() {
 
     setIsSendingEmail(true);
 
-    // TODO: 이메일 인증번호 전송 API 연결
-    // 예시: await api.post('/auth/email/send', { email: formData.email });
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    setEmailSent(true);
+    setEmailSent(false);
     setEmailVerified(false);
     setIsSendingEmail(false);
-    alert('인증번호가 이메일로 전송되었습니다.');
+    alert('이메일 인증 API는 백엔드 추가 예정입니다. 현재 회원가입은 인증 없이 진행됩니다.');
   };
 
   const handleCheckEmailCode = async () => {
@@ -61,33 +60,37 @@ export default function PatientRegister() {
 
     setIsCheckingCode(true);
 
-    // TODO: 이메일 인증번호 확인 API 연결
-    // 예시: await api.post('/auth/email/verify', { email: formData.email, code: emailCode });
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    setEmailVerified(true);
     setIsCheckingCode(false);
-    alert('이메일 인증이 완료되었습니다.');
+    alert('이메일 인증 API가 추가되면 이 단계에서 인증번호를 확인합니다.');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!emailVerified) {
-      alert('이메일 인증을 완료해주세요.');
-      return;
-    }
 
     if (formData.password !== formData.confirmPassword) {
       alert('비밀번호가 일치하지 않습니다.');
       return;
     }
 
-    // TODO: 환자 회원가입 API 연결
-    console.log('환자 가입 데이터:', formData);
+    setIsSubmitting(true);
 
-    alert('환자 회원가입이 완료되었습니다. 로그인해주세요.');
-    navigate('/login');
+    try {
+      await patientApi.signUp({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        phone: formData.phone,
+        sex: toApiSex(formData.gender),
+        age: Number(formData.age),
+      });
+
+      alert('환자 회원가입이 완료되었습니다. 로그인해주세요.');
+      navigate('/login');
+    } catch (submitError) {
+      alert(submitError.message || '회원가입에 실패했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -205,7 +208,9 @@ export default function PatientRegister() {
           />
 
           <div className="pt-4 flex flex-col gap-3">
-            <Button type="submit" className="w-full py-3 text-lg">가입 완료</Button>
+            <Button type="submit" disabled={isSubmitting} className="w-full py-3 text-lg">
+              {isSubmitting ? '가입 중' : '가입 완료'}
+            </Button>
             <Button type="button" variant="outline" onClick={() => navigate('/login')} className="w-full">
               이전으로
             </Button>

@@ -1,7 +1,8 @@
-﻿import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { patientsData } from '../../api/mockPatients';
-import useAppStore from '../../store/useAppStore';
+import { reservationApi } from '../../api/apiClient';
+import { toDateKey, toDateTimeInputValue } from '../../api/adapters';
+import { useDoctorPatients } from '../../hooks/usePatientData';
 
 const appointmentTypes = [
   { value: '정기 검진', description: '정기 외래 진료' },
@@ -12,34 +13,33 @@ const appointmentTypes = [
 
 export default function AppointmentCreatePage() {
   const navigate = useNavigate();
-  const { currentDoctorId, currentDoctorName, patientAssignments } = useAppStore();
-
-  const assignedPatients = useMemo(() => {
-    return patientsData.filter(patient => patientAssignments[patient.id]?.doctorId === currentDoctorId);
-  }, [currentDoctorId, patientAssignments]);
-
-  const today = new Date();
-  const defaultDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+  const { data: assignedPatients = [] } = useDoctorPatients();
+  const todayKey = toDateKey(new Date());
 
   const [formData, setFormData] = useState({
-    patientId: assignedPatients[0]?.id || '',
-    date: defaultDate,
+    patientId: '',
+    date: todayKey,
     time: '09:00',
     type: '정기 검진',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const selectedPatient = assignedPatients.find(patient => patient.id === formData.patientId);
+  const selectedPatient = useMemo(() => (
+    assignedPatients.find(patient => String(patient.id) === String(formData.patientId)) || assignedPatients[0]
+  ), [assignedPatients, formData.patientId]);
+
+  React.useEffect(() => {
+    if (!formData.patientId && assignedPatients[0]?.id) {
+      setFormData(prev => ({ ...prev, patientId: assignedPatients[0].id }));
+    }
+  }, [assignedPatients, formData.patientId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleTypeSelect = (type) => {
-    setFormData(prev => ({ ...prev, type }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.patientId) {
@@ -47,16 +47,25 @@ export default function AppointmentCreatePage() {
       return;
     }
 
-    const appointmentPayload = {
-      ...formData,
-      doctorId: currentDoctorId,
-      doctorName: currentDoctorName,
-      patientName: selectedPatient?.name,
-    };
+    setIsSubmitting(true);
 
-    console.log('예약 등록 데이터:', appointmentPayload);
-    alert('환자 예약이 등록되었습니다.');
-    navigate(`/doctor/${formData.patientId}`);
+    try {
+      const reservation = await reservationApi.create({
+        patientId: Number(formData.patientId),
+        reservationDate: toDateTimeInputValue(formData.date, formData.time),
+      });
+
+      window.dispatchEvent(new CustomEvent('capd:reservations-changed', {
+        detail: { date: formData.date, reservation },
+      }));
+
+      alert('환자 예약이 등록되었습니다.');
+      navigate('/doctor/appointments/check');
+    } catch (error) {
+      alert(error.message || '예약 등록에 실패했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -149,7 +158,7 @@ export default function AppointmentCreatePage() {
                     <button
                       key={type.value}
                       type="button"
-                      onClick={() => handleTypeSelect(type.value)}
+                      onClick={() => setFormData(prev => ({ ...prev, type: type.value }))}
                       className={`rounded-2xl border p-4 text-left transition-all ${
                         isActive
                           ? 'border-blue-500 bg-blue-50 shadow-sm ring-2 ring-blue-100'
@@ -190,9 +199,9 @@ export default function AppointmentCreatePage() {
                   </div>
 
                   <div className="mt-5 grid grid-cols-3 gap-3">
-                    <InfoBox label="CAPD 시작일" value={selectedPatient.capdStartDate} />
-                    <InfoBox label="최근 투석일" value={selectedPatient.lastDialysis} />
-                    <InfoBox label="담당의" value={`${currentDoctorName} 선생님`} />
+                    <InfoBox label="전화번호" value={selectedPatient.phone} />
+                    <InfoBox label="이메일" value={selectedPatient.email} />
+                    <InfoBox label="환자번호" value={selectedPatient.id} />
                   </div>
                 </div>
 
@@ -233,9 +242,10 @@ export default function AppointmentCreatePage() {
 
             <button
               type="submit"
-              className="mt-4 shrink-0 w-full rounded-2xl bg-blue-600 py-4 text-base font-black text-white shadow-lg transition-all hover:bg-blue-700 active:scale-[0.99]"
+              disabled={isSubmitting || assignedPatients.length === 0}
+              className="mt-4 shrink-0 w-full rounded-2xl bg-blue-600 py-4 text-base font-black text-white shadow-lg transition-all hover:bg-blue-700 active:scale-[0.99] disabled:bg-slate-300"
             >
-              예약 등록하기
+              {isSubmitting ? '예약 등록 중' : '예약 등록하기'}
             </button>
           </section>
         </aside>
@@ -257,7 +267,7 @@ function InfoBox({ label, value }) {
   return (
     <div className="rounded-xl border border-slate-200 bg-white px-3 py-3">
       <div className="text-[11px] font-black text-slate-400">{label}</div>
-      <div className="mt-1 wrap-break-word text-xs font-black text-slate-800">{value}</div>
+      <div className="mt-1 wrap-break-word text-xs font-black text-slate-800">{value || '-'}</div>
     </div>
   );
 }
