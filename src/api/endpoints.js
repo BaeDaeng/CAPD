@@ -5,12 +5,14 @@ const withPathParams = (path, params = {}) => (
   )
 );
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://34.47.84.250:8080';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://kimjeongmo.shop';
 
 export const ENDPOINTS = {
   auth: {
     patientTokens: '/api/auths/patients/tokens',
+    patientTokenRefresh: '/api/auths/patients/tokens/refresh',
     doctorTokens: '/api/auths/doctors/tokens',
+    doctorTokenRefresh: '/api/auths/doctors/tokens/refresh',
   },
   patients: {
     root: '/api/patients',

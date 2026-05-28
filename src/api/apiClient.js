@@ -22,10 +22,63 @@ export const clearStoredSession = () => {
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+const refreshClient = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+let refreshRequest = null;
+
+const getRefreshEndpoint = (role) => (
+  role === 'doctor' ? ENDPOINTS.auth.doctorTokenRefresh : ENDPOINTS.auth.patientTokenRefresh
+);
+
+const updateStoredAccessToken = (tokenData = {}) => {
+  const session = getStoredSession();
+  const accessToken = tokenData.accessToken;
+
+  if (!session || !accessToken) return null;
+
+  const expiresAt = tokenData.expirationTime ?? tokenData.expiresAt ?? session.expiresAt;
+  const nextSession = {
+    ...session,
+    accessToken,
+    expiresAt,
+    issuedAt: Date.now(),
+    user: {
+      ...session.user,
+      expiresAt,
+    },
+  };
+
+  saveStoredSession(nextSession);
+  window.dispatchEvent(new CustomEvent('capd:access-token-refreshed', { detail: nextSession }));
+
+  return nextSession;
+};
+
+const refreshAccessToken = async (role) => {
+  if (!refreshRequest) {
+    // refreshToken은 HttpOnly Cookie에 있으므로 body 없이 요청하고, 브라우저가 쿠키를 자동 첨부합니다.
+    refreshRequest = refreshClient
+      .post(getRefreshEndpoint(role))
+      .then(response => updateStoredAccessToken(unwrap(response)))
+      .finally(() => {
+        refreshRequest = null;
+      });
+  }
+
+  return refreshRequest;
+};
 
 apiClient.interceptors.request.use((config) => {
   const session = getStoredSession();
@@ -37,6 +90,45 @@ apiClient.interceptors.request.use((config) => {
 
   return config;
 });
+
+apiClient.interceptors.response.use(
+  response => response,
+  async (error) => {
+    const originalRequest = error.config;
+    const session = getStoredSession();
+    const canRefresh = (
+      error.response?.status === 401 &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest.skipAuthRefresh &&
+      session?.role
+    );
+
+    if (!canRefresh) {
+      throw error;
+    }
+
+    originalRequest._retry = true;
+
+    try {
+      // Access Token이 만료되면 refresh API로 새 accessToken을 받고 원래 요청을 한 번 재시도합니다.
+      const nextSession = await refreshAccessToken(session.role);
+
+      if (!nextSession?.accessToken) {
+        throw new Error('새 accessToken을 발급받지 못했습니다.');
+      }
+
+      originalRequest.headers = originalRequest.headers || {};
+      originalRequest.headers.Authorization = `Bearer ${nextSession.accessToken}`;
+
+      return apiClient(originalRequest);
+    } catch (refreshError) {
+      clearStoredSession();
+      window.dispatchEvent(new CustomEvent('capd:auth-expired'));
+      throw refreshError;
+    }
+  },
+);
 
 const unwrap = (response) => {
   const body = response.data;
@@ -79,10 +171,22 @@ export const authApi = {
   logoutPatient: () => apiRequest({
     method: 'delete',
     url: ENDPOINTS.auth.patientTokens,
+    skipAuthRefresh: true,
   }),
   logoutDoctor: () => apiRequest({
     method: 'delete',
     url: ENDPOINTS.auth.doctorTokens,
+    skipAuthRefresh: true,
+  }),
+  refreshPatient: () => apiRequest({
+    method: 'post',
+    url: ENDPOINTS.auth.patientTokenRefresh,
+    skipAuthRefresh: true,
+  }),
+  refreshDoctor: () => apiRequest({
+    method: 'post',
+    url: ENDPOINTS.auth.doctorTokenRefresh,
+    skipAuthRefresh: true,
   }),
 };
 

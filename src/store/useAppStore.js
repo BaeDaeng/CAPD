@@ -15,7 +15,6 @@ const makeUser = (role, data) => ({
 const makeSession = (role, data) => ({
   role,
   accessToken: data.accessToken,
-  refreshToken: data.refreshToken || null,
   expiresAt: data.expiresAt,
   user: makeUser(role, data),
   issuedAt: Date.now(),
@@ -64,5 +63,23 @@ const useAppStore = create((set) => ({
   setSelectedPatientId: (id) => set({ selectedPatientId: id }),
 
 }));
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('capd:access-token-refreshed', (event) => {
+    const session = event.detail;
+    if (!session) return;
+
+    // refreshToken은 쿠키에 남고, 프론트 상태는 새 accessToken만 최신 값으로 맞춥니다.
+    useAppStore.setState({
+      session,
+      user: session.user,
+      isAuthenticated: true,
+    });
+  });
+
+  window.addEventListener('capd:auth-expired', () => {
+    useAppStore.getState().logout();
+  });
+}
 
 export default useAppStore;

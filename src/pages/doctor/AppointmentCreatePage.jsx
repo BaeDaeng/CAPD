@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { reservationApi } from '../../api/apiClient';
 import { toDateKey, toDateTimeInputValue } from '../../api/adapters';
-import { useDoctorPatients } from '../../hooks/usePatientData';
+import { useDoctorPatientProfile, useDoctorPatients } from '../../hooks/usePatientData';
 
 const appointmentTypes = [
   { value: '정기 검진', description: '정기 외래 진료' },
@@ -27,6 +27,10 @@ export default function AppointmentCreatePage() {
   const selectedPatient = useMemo(() => (
     assignedPatients.find(patient => String(patient.id) === String(formData.patientId)) || assignedPatients[0]
   ), [assignedPatients, formData.patientId]);
+  const { data: selectedPatientProfile, isLoading: isPatientProfileLoading } = useDoctorPatientProfile(selectedPatient?.id);
+  const displayPatient = useMemo(() => (
+    mergePatientProfile(selectedPatient, selectedPatientProfile)
+  ), [selectedPatient, selectedPatientProfile]);
 
   React.useEffect(() => {
     if (!formData.patientId && assignedPatients[0]?.id) {
@@ -183,25 +187,25 @@ export default function AppointmentCreatePage() {
           <section className="flex min-h-0 flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
             <h2 className="mb-3 shrink-0 text-base font-black text-slate-900">예약 대상 환자</h2>
 
-            {selectedPatient ? (
+            {displayPatient ? (
               <div className="flex min-h-0 flex-1 flex-col justify-between rounded-2xl bg-slate-50 p-5">
                 <div>
                   <div className="flex items-center gap-4">
                     <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-blue-100 text-2xl font-black text-blue-600">
-                      {selectedPatient.name.charAt(0)}
+                      {displayPatient.name.charAt(0)}
                     </div>
                     <div className="min-w-0">
-                      <div className="truncate text-xl font-black text-slate-900">{selectedPatient.name}</div>
+                      <div className="truncate text-xl font-black text-slate-900">{displayPatient.name}</div>
                       <div className="mt-1 text-sm font-bold text-slate-400">
-                        {selectedPatient.id} · {selectedPatient.sex}/{selectedPatient.age}세
+                        {displayPatient.id} · {displayPatient.sex}/{displayPatient.age}세
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-5 grid grid-cols-3 gap-3">
-                    <InfoBox label="전화번호" value={selectedPatient.phone} />
-                    <InfoBox label="이메일" value={selectedPatient.email} />
-                    <InfoBox label="환자번호" value={selectedPatient.id} />
+                    <InfoBox label="전화번호" value={displayPatient.phone} isLoading={isPatientProfileLoading} />
+                    <InfoBox label="이메일" value={displayPatient.email} isLoading={isPatientProfileLoading} />
+                    <InfoBox label="환자번호" value={displayPatient.id} />
                   </div>
                 </div>
 
@@ -232,7 +236,7 @@ export default function AppointmentCreatePage() {
               <div className="rounded-2xl border border-blue-100 bg-white/80 p-5">
                 <div className="text-sm font-black text-slate-400">예약 내용</div>
                 <div className="mt-3 truncate text-xl font-black text-slate-900">
-                  {selectedPatient?.name || '환자'}
+                  {displayPatient?.name || '환자'}
                 </div>
                 <div className="mt-3 w-fit rounded-full bg-blue-100 px-3 py-1 text-sm font-black text-blue-700">
                   {formData.type}
@@ -254,6 +258,26 @@ export default function AppointmentCreatePage() {
   );
 }
 
+function mergePatientProfile(patient, profile) {
+  if (!patient) return null;
+  if (!profile) return patient;
+
+  return {
+    ...patient,
+    ...profile,
+    email: preferProfileValue(profile.email, patient.email),
+    phone: preferProfileValue(profile.phone, patient.phone),
+  };
+}
+
+function preferProfileValue(profileValue, fallbackValue) {
+  if (profileValue === undefined || profileValue === null || profileValue === '' || profileValue === '-') {
+    return fallbackValue || '-';
+  }
+
+  return profileValue;
+}
+
 function Field({ label, children }) {
   return (
     <label className="block">
@@ -263,11 +287,13 @@ function Field({ label, children }) {
   );
 }
 
-function InfoBox({ label, value }) {
+function InfoBox({ label, value, isLoading = false }) {
+  const displayValue = isLoading && (!value || value === '-') ? '조회 중' : value;
+
   return (
     <div className="rounded-xl border border-slate-200 bg-white px-3 py-3">
       <div className="text-[11px] font-black text-slate-400">{label}</div>
-      <div className="mt-1 wrap-break-word text-xs font-black text-slate-800">{value || '-'}</div>
+      <div className="mt-1 wrap-break-word text-xs font-black text-slate-800">{displayValue || '-'}</div>
     </div>
   );
 }
