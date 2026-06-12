@@ -84,7 +84,7 @@ export default function PatientChartsPage() {
     }
 
     return (
-        <div className="flex h-full flex-col overflow-hidden bg-slate-50 p-4 animate-in fade-in duration-500 md:p-5">
+        <div className="flex h-full min-w-0 flex-col overflow-y-auto bg-slate-50 p-4 animate-in fade-in duration-500 md:p-5 custom-scrollbar">
             <div className="mb-3 shrink-0">
                 <BackToPatientButton />
 
@@ -107,7 +107,7 @@ export default function PatientChartsPage() {
                 </div>
             </div>
 
-            <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+            <div className="grid min-h-0 flex-1 auto-rows-[minmax(220px,1fr)] grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
                 <ChartPanel title="일 단위 종합 추이">
                     <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={chartData} margin={{ top: 8, right: 4, left: -18, bottom: -4 }}>

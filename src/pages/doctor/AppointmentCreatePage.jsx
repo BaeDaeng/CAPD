@@ -115,8 +115,8 @@ export default function AppointmentCreatePage() {
   };
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden bg-slate-50 p-4 animate-in fade-in duration-500">
-      <div className="mb-3 flex shrink-0 items-end justify-between gap-4">
+    <div className="flex h-full min-h-0 min-w-0 flex-col overflow-y-auto bg-slate-50 p-4 animate-in fade-in duration-500 custom-scrollbar">
+      <div className="mb-3 flex shrink-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="text-xs font-black text-blue-600">APPOINTMENT</div>
           <h1 className="mt-1 text-2xl font-black text-slate-900">환자 예약 등록</h1>
@@ -134,8 +134,8 @@ export default function AppointmentCreatePage() {
         </button>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid min-h-0 flex-1 grid-cols-12 gap-4">
-        <section className="col-span-7 flex min-h-0 flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+      <form onSubmit={handleSubmit} className="grid min-h-0 min-w-0 flex-1 grid-cols-1 items-stretch gap-4 xl:grid-cols-12">
+        <section className="flex min-h-0 min-w-0 flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-sm xl:col-span-7">
           <div className="mb-3 shrink-0 border-b border-slate-100 pb-3">
             <h2 className="text-base font-black text-slate-900">예약 정보 입력</h2>
             <p className="mt-1 text-xs font-bold text-slate-400">
@@ -143,7 +143,7 @@ export default function AppointmentCreatePage() {
             </p>
           </div>
 
-          <div className="grid min-h-0 flex-1 grid-rows-[auto_auto_1fr] gap-3">
+          <div className="grid min-h-0 min-w-0 flex-1 gap-3 xl:grid-rows-[auto_auto_1fr]">
             <section className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
               <Field label="환자 선택">
                 <select
@@ -162,7 +162,7 @@ export default function AppointmentCreatePage() {
               </Field>
             </section>
 
-            <section className="grid grid-cols-2 gap-3">
+            <section className="grid grid-cols-1 gap-3 lg:grid-cols-2">
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
                 <Field label="예약 날짜">
                   <input
@@ -193,7 +193,7 @@ export default function AppointmentCreatePage() {
                 <div className="mt-1 text-xs font-bold text-slate-400">진료 목적에 맞는 유형을 선택하세요.</div>
               </div>
 
-              <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-2 gap-3">
+              <div className="grid min-h-0 min-w-0 flex-1 grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-rows-2">
                 {appointmentTypes.map(type => {
                   const isActive = formData.type === type.value;
 
@@ -222,12 +222,12 @@ export default function AppointmentCreatePage() {
           </div>
         </section>
 
-        <aside className="col-span-5 grid min-h-0 grid-rows-[1fr_1fr] gap-4">
-          <section className="flex min-h-0 flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
+        <aside className="grid min-h-0 min-w-0 gap-4 xl:col-span-5 xl:grid-rows-[minmax(min-content,1fr)_auto]">
+          <section className="flex min-h-fit min-w-0 flex-col rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
             <h2 className="mb-3 shrink-0 text-base font-black text-slate-900">예약 대상 환자</h2>
 
             {displayPatient ? (
-              <div className="flex min-h-0 flex-1 flex-col justify-between rounded-2xl bg-slate-50 p-5">
+              <div className="flex min-h-fit flex-1 flex-col gap-4 rounded-2xl bg-slate-50 p-5">
                 <div>
                   <div className="flex items-center gap-4">
                     <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-blue-100 text-2xl font-black text-blue-600">
@@ -241,13 +241,13 @@ export default function AppointmentCreatePage() {
                     </div>
                   </div>
 
-                  <div className="mt-5 grid grid-cols-2 gap-3">
+                  <div className="mt-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
                     <InfoBox label="전화번호" value={displayPatient.phone} isLoading={isPatientProfileLoading} />
                     <InfoBox label="이메일" value={displayPatient.email} isLoading={isPatientProfileLoading} />
                   </div>
                 </div>
 
-                <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="text-xs font-black text-slate-400">예약 방식</div>
                   <p className="mt-2 text-sm font-bold leading-relaxed text-slate-600">
                     의사가 담당 환자를 선택하여 예약을 등록합니다.
@@ -261,14 +261,14 @@ export default function AppointmentCreatePage() {
             )}
           </section>
 
-          <section className="flex min-h-0 flex-col rounded-2xl border border-blue-100 bg-blue-50 p-4 shadow-sm">
+          <section className="flex min-h-0 min-w-0 flex-col rounded-2xl border border-blue-100 bg-blue-50 p-4 shadow-sm">
             <div className="mb-3 shrink-0 text-xs font-black text-blue-600">예약 미리보기</div>
 
-            <div className="grid min-h-0 flex-1 grid-cols-2 gap-3">
+            <div className="grid min-h-0 min-w-0 grid-cols-1 gap-3 lg:grid-cols-2">
               <div className="rounded-2xl bg-white p-5 shadow-sm">
                 <div className="text-sm font-black text-slate-400">예약 일시</div>
-                <div className="mt-3 text-2xl font-black text-slate-900">{formData.date}</div>
-                <div className="mt-1 text-2xl font-black text-blue-700">{formData.time}</div>
+                <div className="mt-3 text-xl font-black text-slate-900 2xl:text-2xl">{formData.date}</div>
+                <div className="mt-1 text-xl font-black text-blue-700 2xl:text-2xl">{formData.time}</div>
               </div>
 
               <div className="rounded-2xl border border-blue-100 bg-white/80 p-5">
@@ -332,10 +332,10 @@ function HalfHourTimeSelect({ value, onChange }) {
     onChange(toTimeValue({ ...parts, [key]: nextValue }));
   };
 
-  const selectClass = 'w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-center text-base font-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100';
+  const selectClass = 'min-w-0 w-full rounded-xl border border-slate-200 bg-white px-2 py-3 text-center text-sm font-black outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 2xl:text-base';
 
   return (
-    <div className="grid grid-cols-[1fr_1fr_1fr] gap-2">
+    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2">
       <select
         aria-label="오전 오후"
         value={parts.period}

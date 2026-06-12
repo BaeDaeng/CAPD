@@ -30,8 +30,8 @@ export default function DoctorMyPage() {
   const displayName = doctor?.name || user?.name || '담당의';
 
   return (
-    <div className="h-full overflow-hidden bg-slate-50 p-4 md:p-6 animate-in fade-in duration-500">
-      <div className="grid h-full min-h-0 grid-cols-12 gap-4">
+    <div className="h-full overflow-y-auto bg-slate-50 p-4 animate-in fade-in duration-500 md:p-6 custom-scrollbar">
+      <div className="grid min-h-full grid-cols-12 gap-4">
         <section className="col-span-12 flex min-h-0 flex-col overflow-hidden rounded-3xl border border-slate-200 bg-slate-900 text-white shadow-sm xl:col-span-4">
           <div className="relative p-6">
             <div className="absolute right-0 top-0 h-40 w-40 rounded-full bg-blue-500/20 blur-3xl"></div>
@@ -88,8 +88,8 @@ export default function DoctorMyPage() {
           </div>
         </section>
 
-        <main className="col-span-12 min-h-0 rounded-3xl border border-slate-100 bg-white p-5 shadow-sm xl:col-span-8">
-          <div className="mb-4 flex items-center justify-between gap-4">
+        <main className="col-span-12 flex min-h-[520px] flex-col rounded-3xl border border-slate-100 bg-white p-5 shadow-sm xl:col-span-8">
+          <div className="mb-4 flex shrink-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="text-[10px] font-black uppercase tracking-widest text-blue-500">
                 Assigned Patients
@@ -113,7 +113,7 @@ export default function DoctorMyPage() {
             </div>
           </div>
 
-          <div className="grid h-[calc(100%-76px)] min-h-0 grid-cols-1 gap-3 overflow-hidden md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-3 overflow-y-auto md:grid-cols-2 xl:grid-cols-3 custom-scrollbar">
             {enrichedAssignedPatients.map(patient => (
               <PatientMiniCard key={patient.id} patient={patient} isLoadingDetails={isPatientProfilesLoading} />
             ))}

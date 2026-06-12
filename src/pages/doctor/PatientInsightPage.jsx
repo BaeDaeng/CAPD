@@ -60,8 +60,8 @@ export default function PatientInsightPage() {
   const chartLabelPlacements = new Map();
 
   return (
-    <div className="p-4 md:p-6 animate-in fade-in duration-500 h-full flex flex-col overflow-hidden bg-slate-50">
-      <div className="mb-4 flex justify-between items-end shrink-0">
+    <div className="flex h-full min-w-0 flex-col overflow-y-auto bg-slate-50 p-4 animate-in fade-in duration-500 md:p-6 custom-scrollbar">
+      <div className="mb-4 flex shrink-0 flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <div className="text-sm font-bold text-blue-500 mb-1">PATIENT INSIGHT</div>
           <h1 className="text-2xl font-black text-gray-900">{patient.name} 환자 상세 현황</h1>
@@ -117,7 +117,7 @@ export default function PatientInsightPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4 flex-[1.2] min-h-0">
+      <div className="grid min-h-[420px] grid-cols-1 gap-4 lg:grid-cols-3 xl:min-h-0 xl:flex-[1.2]">
         <div className="lg:col-span-2 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 relative h-full flex flex-col min-h-0">
           <button
             onClick={() => navigate(`/doctor/${id}/charts`)}
@@ -180,7 +180,7 @@ export default function PatientInsightPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
+      <div className="grid min-h-[360px] flex-1 grid-cols-1 gap-4 lg:grid-cols-3 xl:min-h-0">
         <div className="lg:col-span-2 bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100 relative h-full flex flex-col min-h-0">
           <button
             onClick={() => navigate(`/doctor/${id}/logs`)}
@@ -191,8 +191,8 @@ export default function PatientInsightPage() {
           </button>
           <h3 className="text-base font-bold text-gray-800 mb-3 shrink-0">최근 3일 투석 상세 기록</h3>
 
-          <div className="flex-1 overflow-y-auto custom-scrollbar min-h-0 border-t border-gray-100">
-            <table className="w-full text-left text-xs md:text-sm">
+          <div className="min-h-0 flex-1 overflow-auto border-t border-gray-100 custom-scrollbar">
+            <table className="min-w-[560px] w-full text-left text-xs md:text-sm">
               <thead className="bg-slate-50 text-gray-500 font-bold sticky top-0 shadow-sm">
                 <tr>
                   <th className="px-3 py-2.5">날짜 / 시간</th>

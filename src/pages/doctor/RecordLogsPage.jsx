@@ -72,7 +72,7 @@ export default function RecordLogsPage() {
   }
 
   return (
-    <div className="p-4 md:p-6 animate-in fade-in duration-500 h-full flex flex-col bg-slate-50 overflow-hidden">
+    <div className="flex h-full flex-col overflow-y-auto bg-slate-50 p-4 animate-in fade-in duration-500 md:p-6 custom-scrollbar">
       <div className="shrink-0 mb-6">
         <BackToPatientButton />
         <h1 className="text-2xl font-black text-gray-900 flex items-center gap-3">
@@ -82,8 +82,8 @@ export default function RecordLogsPage() {
         <p className="text-sm text-gray-500 mt-2">{patient.name} 환자의 투석 교환 및 건강 수치 기록입니다.</p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 flex-1 min-h-0">
-        <div className="lg:w-80 shrink-0 flex flex-col gap-4">
+      <div className="flex min-h-[560px] flex-1 flex-col gap-6 lg:flex-row xl:min-h-0">
+        <div className="flex shrink-0 flex-col gap-4 lg:w-72 xl:w-80">
           <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-black text-gray-900 text-lg">{year}년 {month + 1}월</h3>
@@ -133,7 +133,7 @@ export default function RecordLogsPage() {
           </div>
         </div>
 
-        <div className="flex-1 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-y-auto custom-scrollbar p-2">
+        <div className="flex-1 overflow-y-auto rounded-2xl border border-gray-100 bg-white p-2 shadow-sm custom-scrollbar">
           <div className="space-y-3">
             {history.map((dayData) => {
               const isOpen = displayOpenDates.includes(dayData.date);
@@ -178,8 +178,8 @@ export default function RecordLogsPage() {
                         <HealthSummary icon="i" label="소변/혼탁도" value={`${dayData.urineCount || 0}회 / ${dayData.turbidity}`} />
                       </div>
 
-                      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
-                        <table className="w-full text-left text-xs md:text-sm">
+                      <div className="overflow-x-auto rounded-xl border border-gray-100 bg-white">
+                        <table className="min-w-[560px] w-full text-left text-xs md:text-sm">
                           <thead className="bg-slate-100 text-gray-500 font-bold border-b border-gray-200">
                             <tr>
                               <th className="px-4 py-3">회차/시간</th>

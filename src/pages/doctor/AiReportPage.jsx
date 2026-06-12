@@ -326,7 +326,7 @@ export default function AiReportPage() {
   };
 
   return (
-    <div className="ai-report-page h-full overflow-hidden bg-slate-50 p-4 md:p-6 animate-in fade-in duration-500">
+    <div className="ai-report-page h-full overflow-y-auto bg-slate-50 p-4 animate-in fade-in duration-500 md:p-6 custom-scrollbar">
       <div className="flex h-full min-h-0 flex-col">
         <div className="ai-report-no-print mb-5 shrink-0">
           <BackToPatientButton />
@@ -349,7 +349,7 @@ export default function AiReportPage() {
           </div>
         </div>
 
-        <div className="ai-report-layout grid min-h-0 flex-1 grid-cols-1 gap-4 xl:grid-cols-12">
+        <div className="ai-report-layout grid min-h-[620px] flex-1 grid-cols-1 gap-4 xl:min-h-0 xl:grid-cols-12">
           <aside className="ai-report-no-print min-h-0 xl:col-span-4 overflow-y-auto custom-scrollbar pr-1">
             <Card className="flex h-fit flex-col border-none p-5 shadow-sm">
               <h3 className="mb-4 text-sm font-black text-gray-800">보고서 조건</h3>

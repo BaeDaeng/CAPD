@@ -29,7 +29,7 @@ export default function QuestionCheckPage() {
   const totalSurveyCount = useMemo(() => answers.length, [answers]);
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-slate-50 p-4 animate-in fade-in duration-500 md:p-6">
+    <div className="flex h-full flex-col overflow-y-auto bg-slate-50 p-4 animate-in fade-in duration-500 md:p-6 custom-scrollbar">
       <div className="mb-5 shrink-0">
         <BackToPatientButton />
 
@@ -51,7 +51,7 @@ export default function QuestionCheckPage() {
         </div>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 xl:grid-cols-12">
+      <div className="grid min-h-[560px] flex-1 grid-cols-1 gap-6 xl:min-h-0 xl:grid-cols-12">
         <aside className="flex min-h-0 flex-col gap-4 overflow-y-auto pr-1 custom-scrollbar xl:col-span-3">
           <Card className="shrink-0 border-none p-5 shadow-sm">
             <h3 className="mb-4 text-sm font-black text-gray-800">환자 요약</h3>

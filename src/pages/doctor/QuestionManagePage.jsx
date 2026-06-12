@@ -82,7 +82,7 @@ export default function QuestionManagePage() {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-slate-50 p-4 animate-in fade-in duration-500 md:p-6">
+    <div className="flex h-full flex-col overflow-y-auto bg-slate-50 p-4 animate-in fade-in duration-500 md:p-6 custom-scrollbar">
       <div className="mb-5 shrink-0">
         <BackToPatientButton />
 
@@ -108,7 +108,7 @@ export default function QuestionManagePage() {
         </div>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 xl:grid-cols-12">
+      <div className="grid min-h-[560px] flex-1 grid-cols-1 gap-6 xl:min-h-0 xl:grid-cols-12">
         <aside className="flex min-h-0 flex-col gap-4 xl:col-span-3 overflow-y-auto custom-scrollbar pr-1">
           <Card className="border-none p-5 shadow-sm shrink-0">
             <h3 className="mb-4 text-sm font-black text-gray-800">환자 요약</h3>
@@ -173,7 +173,7 @@ export default function QuestionManagePage() {
         <main className="flex min-h-0 flex-col xl:col-span-9">
           <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm">
             <div className="shrink-0 border-b border-gray-100 bg-slate-50 px-4 pt-4">
-              <div className="flex gap-6">
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
                 <TabButton active={activeTab === 'PENDING'} onClick={() => setActiveTab('PENDING')} color="blue">
                   승인 대기 ({counts.PENDING})
                 </TabButton>

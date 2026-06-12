@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useMemo, useState } from 'react';
-import { Outlet, useNavigate, Link, useParams } from 'react-router-dom';
+import { Outlet, useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 import useAppStore from '../store/useAppStore';
 import DoctorChatPage from '../pages/doctor/DoctorChatPage';
 import { authApi } from '../api/apiClient';
@@ -14,6 +14,7 @@ import {
 export default function DoctorLayout() {
   const { user, logout } = useAppStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams();
 
   const [patientTab, setPatientTab] = useState('all');
@@ -55,6 +56,7 @@ export default function DoctorLayout() {
     new Set(monthReservations.map(reservation => reservation.date).filter(Boolean))
   ), [monthReservations]);
   const nextReservationByPatientId = buildNextReservationMap(upcomingReservations, todayKey);
+  const isAppointmentPage = location.pathname.startsWith('/doctor/appointments');
 
   const handlePrevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
   const handleNextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
@@ -137,16 +139,16 @@ export default function DoctorLayout() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100 overflow-hidden font-sans text-slate-900">
-      <header className="h-14 bg-slate-900 text-white px-4 flex justify-between items-center z-30 shrink-0 shadow-lg">
-        <Link to="/doctor" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+    <div className="flex h-screen min-w-0 flex-col overflow-hidden bg-gray-100 font-sans text-slate-900">
+      <header className="z-30 flex h-14 shrink-0 items-center justify-between gap-3 bg-slate-900 px-3 text-white shadow-lg sm:px-4">
+        <Link to="/doctor" className="flex min-w-0 items-center gap-3 transition-opacity hover:opacity-80">
           <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center font-bold text-white text-xl">+</div>
-          <div className="text-lg font-bold tracking-tight">
+          <div className="min-w-0 truncate text-base font-bold tracking-tight lg:text-lg">
             CAPD <span className="font-light text-slate-400">EMR System</span>
           </div>
         </Link>
 
-        <div className="flex items-center gap-6">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-4 lg:gap-6">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-slate-200">{user?.name || '담당의'} 선생님</span>
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -167,8 +169,8 @@ export default function DoctorLayout() {
         </div>
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        <aside className="w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 z-20 shadow-sm">
+      <div className="flex min-w-0 flex-1 overflow-hidden">
+        <aside className="z-20 flex w-60 shrink-0 flex-col border-r border-gray-200 bg-white shadow-sm xl:w-72">
           <div className="p-3 border-b space-y-3 bg-slate-50">
             <div className="flex bg-gray-200 p-1 rounded-lg">
               <button
@@ -253,11 +255,11 @@ export default function DoctorLayout() {
           </div>
         </aside>
 
-        <main className="flex-1 overflow-y-auto bg-slate-50 relative">
+        <main className="relative min-w-0 flex-1 overflow-y-auto bg-slate-50">
           <Outlet />
         </main>
 
-        <aside className="w-80 bg-white border-l border-gray-200 flex flex-col shrink-0 z-10">
+        <aside className={`z-10 w-56 shrink-0 flex-col border-l border-gray-200 bg-white lg:w-64 xl:w-72 2xl:w-80 ${isAppointmentPage ? 'hidden' : 'flex'}`}>
           <div className="p-4 border-b">
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-bold text-sm text-gray-700">{year}년 {month + 1}월</h3>
